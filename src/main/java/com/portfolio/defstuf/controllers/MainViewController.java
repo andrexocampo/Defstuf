@@ -22,5 +22,6 @@ public class MainViewController {
         var javafxVersion = SystemInfo.javafxVersion();
         infoLabel.setText("JavaFX " + javafxVersion + ", ejecutándose en Java " + javaVersion);
     }
+    
 }
 
