@@ -1,8 +1,11 @@
 package com.portfolio.defstuf.controllers;
 
 import com.portfolio.defstuf.SystemInfo;
-import com.portfolio.defstuf.controllers.screenshot.ScreenshotController;
+import com.portfolio.defstuf.controllers.note.CreateNoteController;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
@@ -39,12 +42,39 @@ public class MainViewController {
     }
     
     /**
-     * Opens the screenshot tool
+     * Opens the Create Note view
      */
     @FXML
     private void openScreenshotTool() {
-        ScreenshotController screenshotController = new ScreenshotController();
-        screenshotController.setPrimaryStage(primaryStage);
-        screenshotController.startCapture();
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/com/portfolio/defstuf/views/note/CreateNoteView.fxml")
+            );
+            Parent root = loader.load();
+            
+            // Get the controller and set the primary stage
+            CreateNoteController controller = loader.getController();
+            controller.setPrimaryStage(primaryStage);
+            
+            Scene scene = new Scene(root, 800, 700);
+            scene.getStylesheets().add(
+                getClass().getResource("/com/portfolio/defstuf/styles/main.css").toExternalForm()
+            );
+            
+            primaryStage.setTitle("DefStuf - Create Note");
+            primaryStage.setScene(scene);
+            primaryStage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+            showError("Error opening Create Note view: " + e.getMessage());
+        }
+    }
+    
+    private void showError(String message) {
+        javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }

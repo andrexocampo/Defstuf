@@ -12,7 +12,7 @@
    <children>
       <Label text="Welcome to DefStuf" />
       <Label fx:id="infoLabel" text="System Information" />
-      <Button fx:id="screenshotButton" text="Screenshot Tool" onAction="#openScreenshotTool" />
+      <Button fx:id="screenshotButton" text="Create Note" onAction="#openScreenshotTool" />
    </children>
    <padding>
       <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />

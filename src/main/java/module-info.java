@@ -9,6 +9,7 @@ module com.portfolio.defstuf {
     exports com.portfolio.defstuf;
     exports com.portfolio.defstuf.controllers;
     exports com.portfolio.defstuf.controllers.screenshot;
+    exports com.portfolio.defstuf.controllers.note;
     exports com.portfolio.defstuf.services.screenshot;
     exports com.portfolio.defstuf.models.screenshot;
     exports com.portfolio.defstuf.util;
@@ -19,4 +20,5 @@ module com.portfolio.defstuf {
     opens com.portfolio.defstuf.views to javafx.fxml;
     opens com.portfolio.defstuf.controllers to javafx.fxml;
     opens com.portfolio.defstuf.controllers.screenshot to javafx.fxml;
+    opens com.portfolio.defstuf.controllers.note to javafx.fxml;
 }
