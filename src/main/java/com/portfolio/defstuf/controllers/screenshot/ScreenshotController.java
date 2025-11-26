@@ -5,8 +5,6 @@ import com.portfolio.defstuf.services.screenshot.ScreenshotCaptureService;
 import com.portfolio.defstuf.util.ImageUtils;
 import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
-import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -23,6 +21,7 @@ import javafx.stage.StageStyle;
 
 import java.awt.AWTException;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 
 /**
