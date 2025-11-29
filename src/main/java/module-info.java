@@ -10,10 +10,16 @@ module com.portfolio.defstuf {
     exports com.portfolio.defstuf.controllers;
     exports com.portfolio.defstuf.controllers.screenshot;
     exports com.portfolio.defstuf.controllers.note;
+    exports com.portfolio.defstuf.controllers.auth;
     exports com.portfolio.defstuf.services.screenshot;
+    exports com.portfolio.defstuf.services.auth;
     exports com.portfolio.defstuf.models.screenshot;
+    exports com.portfolio.defstuf.models.user;
     exports com.portfolio.defstuf.util;
+    exports com.portfolio.defstuf.util.security;
     exports com.portfolio.defstuf.repository;
+    exports com.portfolio.defstuf.repository.user;
+    exports com.portfolio.defstuf.session;
     exports com.portfolio.defstuf.config;
     
     // Open packages for JavaFX FXML
@@ -21,4 +27,5 @@ module com.portfolio.defstuf {
     opens com.portfolio.defstuf.controllers to javafx.fxml;
     opens com.portfolio.defstuf.controllers.screenshot to javafx.fxml;
     opens com.portfolio.defstuf.controllers.note to javafx.fxml;
+    opens com.portfolio.defstuf.controllers.auth to javafx.fxml;
 }
