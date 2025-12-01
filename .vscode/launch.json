@@ -23,6 +23,13 @@
             "request": "launch",
             "mainClass": "com.portfolio.defstuf/com.portfolio.defstuf.repository.DatabaseTest",
             "projectName": "defstuf"
+        },
+        {
+            "type": "java",
+            "name": "AreaTest",
+            "request": "launch",
+            "mainClass": "com.portfolio.defstuf/com.portfolio.defstuf.services.area.AreaTest",
+            "projectName": "defstuf"
         }
     ]
 }
