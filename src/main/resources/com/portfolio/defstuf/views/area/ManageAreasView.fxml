@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/11.0.1" 
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.portfolio.defstuf.controllers.area.ManageAreasController"
+            style="-fx-background-color: #f5f5f5;">
+   
+   <top>
+      <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 20;">
+         <HBox spacing="10" alignment="CENTER_LEFT">
+            <Button text="← Back" onAction="#handleBack" 
+                    style="-fx-background-color: #666; -fx-text-fill: white; -fx-padding: 8 16;" />
+            <Label text="Manage Areas" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
+         </HBox>
+         <Separator />
+         <HBox spacing="10" alignment="CENTER_RIGHT">
+            <Button fx:id="createNewAreaButton" text="Create New Area" onAction="#handleCreateNewArea" 
+                    style="-fx-background-color: #0078d4; -fx-text-fill: white; -fx-padding: 10 20; -fx-font-size: 14px;" />
+         </HBox>
+      </VBox>
+   </top>
+   
+   <center>
+      <ScrollPane fitToWidth="true" fitToHeight="true">
+         <FlowPane fx:id="areasFlowPane" 
+                   hgap="20" vgap="20" 
+                   alignment="TOP_LEFT"
+                   style="-fx-padding: 20; -fx-background-color: #f5f5f5;" />
+      </ScrollPane>
+   </center>
+   
+   <bottom>
+      <HBox alignment="CENTER" style="-fx-padding: 10; -fx-background-color: white;">
+         <Label fx:id="statusLabel" text="" style="-fx-text-fill: #666;" />
+      </HBox>
+   </bottom>
+</BorderPane>
+

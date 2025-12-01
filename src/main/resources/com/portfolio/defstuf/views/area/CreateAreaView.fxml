@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/11.0.1" 
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.portfolio.defstuf.controllers.area.CreateAreaController"
+            style="-fx-background-color: #f5f5f5;">
+   
+   <top>
+      <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 20;">
+         <Label text="Create New Area" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
+         <Separator />
+      </VBox>
+   </top>
+   
+   <center>
+      <VBox spacing="20" alignment="CENTER" style="-fx-padding: 40; -fx-max-width: 400;">
+         <VBox spacing="5">
+            <Label text="Name:" style="-fx-font-size: 14px; -fx-font-weight: bold;" />
+            <TextField fx:id="nameField" promptText="e.g., Linear Algebra" 
+                       style="-fx-font-size: 14px;" />
+            <Label fx:id="nameErrorLabel" text="" style="-fx-text-fill: red; -fx-font-size: 12px;" />
+         </VBox>
+         
+         <VBox spacing="5">
+            <Label text="Code:" style="-fx-font-size: 14px; -fx-font-weight: bold;" />
+            <TextField fx:id="codeField" promptText="e.g., ALG" 
+                       style="-fx-font-size: 14px;" />
+            <Label text="Code can only contain letters, numbers, and underscores (max 50 characters)" 
+                   style="-fx-text-fill: #666; -fx-font-size: 11px;" />
+            <Label fx:id="codeErrorLabel" text="" style="-fx-text-fill: red; -fx-font-size: 12px;" />
+         </VBox>
+      </VBox>
+   </center>
+   
+   <bottom>
+      <HBox spacing="10" alignment="CENTER_RIGHT" 
+            style="-fx-background-color: white; -fx-padding: 20;">
+         <Button fx:id="cancelButton" text="Cancel" onAction="#handleCancel" 
+                 style="-fx-background-color: #666; -fx-text-fill: white; -fx-padding: 10 20;" />
+         <Button fx:id="createButton" text="Create" onAction="#handleCreate" 
+                 style="-fx-background-color: #0078d4; -fx-text-fill: white; -fx-padding: 10 20;" />
+      </HBox>
+   </bottom>
+</BorderPane>
+

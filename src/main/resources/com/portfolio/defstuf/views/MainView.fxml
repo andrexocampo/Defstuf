@@ -8,8 +8,8 @@
 <?import javafx.scene.layout.VBox?>
 
 <BorderPane xmlns="http://javafx.com/javafx/11.0.1" 
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.portfolio.defstuf.controllers.MainViewController">
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.portfolio.defstuf.controllers.MainViewController">
    
    <!-- Top bar with user info and logout -->
    <top>
@@ -29,16 +29,18 @@
    <!-- Main content -->
    <center>
       <VBox alignment="CENTER" spacing="20.0">
-         <children>
+   <children>
             <Label text="Welcome to DefStuf" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
             <Label fx:id="infoLabel" text="System Information" />
             <Button fx:id="createNoteButton" text="Create Note" onAction="#openCreateNoteView" 
                     style="-fx-background-color: #0078d4; -fx-text-fill: white; -fx-padding: 10 20; -fx-font-size: 14px;" />
-         </children>
+            <Button fx:id="manageAreasButton" text="Manage Areas" onAction="#openManageAreasView" 
+                    style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-padding: 10 20; -fx-font-size: 14px;" />
+   </children>
          <BorderPane.margin>
-            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+      <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
          </BorderPane.margin>
-      </VBox>
+</VBox>
    </center>
 </BorderPane>
 

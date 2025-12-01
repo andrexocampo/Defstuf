@@ -28,6 +28,9 @@ public class MainViewController {
     private Button createNoteButton;
     
     @FXML
+    private Button manageAreasButton;
+    
+    @FXML
     private Button logoutButton;
     
     private Stage primaryStage;
@@ -90,6 +93,35 @@ public class MainViewController {
         } catch (Exception e) {
             e.printStackTrace();
             showError("Error opening Create Note view: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Opens the Manage Areas view
+     * RF-02.5: Navigation from main view to Manage Areas
+     */
+    @FXML
+    private void openManageAreasView() {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/com/portfolio/defstuf/views/area/ManageAreasView.fxml")
+            );
+            Parent root = loader.load();
+            
+            com.portfolio.defstuf.controllers.area.ManageAreasController controller = loader.getController();
+            controller.setPrimaryStage(primaryStage);
+            
+            Scene scene = new Scene(root, 900, 700);
+            scene.getStylesheets().add(
+                getClass().getResource("/com/portfolio/defstuf/styles/main.css").toExternalForm()
+            );
+            
+            primaryStage.setTitle("DefStuf - Manage Areas");
+            primaryStage.setScene(scene);
+            primaryStage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+            showError("Error opening Manage Areas view: " + e.getMessage());
         }
     }
     
