@@ -2,7 +2,7 @@ package com.portfolio.defstuf;
 
 import com.portfolio.defstuf.controllers.MainViewController;
 import com.portfolio.defstuf.controllers.auth.LoginController;
-import com.portfolio.defstuf.repository.user.DatabaseInitializer;
+import com.portfolio.defstuf.repository.DatabaseInitializer;
 import com.portfolio.defstuf.session.SessionManager;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
