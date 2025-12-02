@@ -70,13 +70,26 @@ CREATE TABLE IF NOT EXISTS areas (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================
--- 6. NOTES TABLE (With user_id for ownership)
+-- 6. SOURCES TABLE (Reference Table)
+-- ============================================
+CREATE TABLE IF NOT EXISTS sources (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    code VARCHAR(50) UNIQUE,  -- UNIQUE already creates index
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    INDEX idx_name (name)  -- Necessary because it's not UNIQUE
+    -- WITHOUT: INDEX idx_code (code)  -- Redundant!
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================
+-- 7. NOTES TABLE (With user_id for ownership)
 -- ============================================
 CREATE TABLE IF NOT EXISTS notes (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT NOT NULL,  -- Owner/creator of the note
     title VARCHAR(255) NOT NULL,
-    source VARCHAR(255),
+    source_id BIGINT,  -- Foreign key to sources table
     description TEXT,
     area_id BIGINT,
     note_type_id BIGINT,
@@ -84,16 +97,18 @@ CREATE TABLE IF NOT EXISTS notes (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (source_id) REFERENCES sources(id) ON DELETE SET NULL,
     FOREIGN KEY (area_id) REFERENCES areas(id) ON DELETE SET NULL,
     FOREIGN KEY (note_type_id) REFERENCES note_type(id) ON DELETE SET NULL,
     INDEX idx_user (user_id),  -- To filter notes by owner
+    INDEX idx_source (source_id),  -- Necessary for JOINs and WHERE
     INDEX idx_area (area_id),  -- Necessary for JOINs and WHERE
     INDEX idx_note_type (note_type_id),  -- Necessary for JOINs and WHERE
     INDEX idx_created_at (created_at)  -- Useful for sorting by date
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================
--- 7. IMAGES TABLE
+-- 8. IMAGES TABLE
 -- ============================================
 CREATE TABLE IF NOT EXISTS images (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -108,7 +123,7 @@ CREATE TABLE IF NOT EXISTS images (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================
--- 8. SESSIONS TABLE (With user_id)
+-- 9. SESSIONS TABLE (With user_id)
 -- ============================================
 CREATE TABLE IF NOT EXISTS sessions (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -123,7 +138,7 @@ CREATE TABLE IF NOT EXISTS sessions (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================
--- 9. ANSWERS TABLE (Reference Table)
+-- 10. ANSWERS TABLE (Reference Table)
 -- ============================================
 CREATE TABLE IF NOT EXISTS answers (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -133,7 +148,7 @@ CREATE TABLE IF NOT EXISTS answers (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================
--- 10. QUESTIONS TABLE (WITH AUTO_INCREMENT ID)
+-- 11. QUESTIONS TABLE (WITH AUTO_INCREMENT ID)
 -- ============================================
 CREATE TABLE IF NOT EXISTS questions (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,  -- Artificial key
@@ -152,7 +167,7 @@ CREATE TABLE IF NOT EXISTS questions (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================
--- 11. SHARED NOTES TABLE (For exporting/sharing notes)
+-- 12. SHARED NOTES TABLE (For exporting/sharing notes)
 -- ============================================
 CREATE TABLE IF NOT EXISTS shared_notes (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,

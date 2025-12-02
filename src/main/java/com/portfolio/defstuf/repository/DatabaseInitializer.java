@@ -88,6 +88,35 @@ public class DatabaseInitializer {
     }
     
     /**
+     * Creates the sources table (reference table)
+     */
+    public static void createSourcesTable() throws Exception {
+        String sql = "CREATE TABLE IF NOT EXISTS sources (" +
+                     "id BIGINT AUTO_INCREMENT PRIMARY KEY, " +
+                     "name VARCHAR(255) NOT NULL, " +
+                     "code VARCHAR(50) UNIQUE, " +
+                     "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
+                     "INDEX idx_name (name)" +
+                     ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
+        
+        executeSQL(sql, "Sources table");
+    }
+    
+    /**
+     * Creates default sources if they don't exist
+     */
+    public static void createDefaultSources() throws Exception {
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             Statement stmt = conn.createStatement()) {
+            
+            // Insert "personal" source if it doesn't exist
+            String sql = "INSERT IGNORE INTO sources (name, code) VALUES ('Personal', 'personal')";
+            stmt.execute(sql);
+            System.out.println("✓ Default sources created or already exist");
+        }
+    }
+    
+    /**
      * Creates the notes table with user_id for ownership
      */
     public static void createNotesTable() throws Exception {
@@ -95,16 +124,18 @@ public class DatabaseInitializer {
                      "id BIGINT AUTO_INCREMENT PRIMARY KEY, " +
                      "user_id BIGINT NOT NULL, " +
                      "title VARCHAR(255) NOT NULL, " +
-                     "source VARCHAR(255), " +
+                     "source_id BIGINT, " +
                      "description TEXT, " +
                      "area_id BIGINT, " +
                      "note_type_id BIGINT, " +
                      "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
                      "updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, " +
                      "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE, " +
+                     "FOREIGN KEY (source_id) REFERENCES sources(id) ON DELETE SET NULL, " +
                      "FOREIGN KEY (area_id) REFERENCES areas(id) ON DELETE SET NULL, " +
                      "FOREIGN KEY (note_type_id) REFERENCES note_type(id) ON DELETE SET NULL, " +
                      "INDEX idx_user (user_id), " +
+                     "INDEX idx_source (source_id), " +
                      "INDEX idx_area (area_id), " +
                      "INDEX idx_note_type (note_type_id), " +
                      "INDEX idx_created_at (created_at)" +
@@ -230,6 +261,8 @@ public class DatabaseInitializer {
             createStatisticsTypeTable();
             createNoteTypeTable();
             createAreasTable();
+            createSourcesTable();
+            createDefaultSources();  // Create default source "personal"
             createAnswersTable();
             
             // Step 2: Create tables that depend on reference tables
