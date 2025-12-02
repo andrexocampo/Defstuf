@@ -10,7 +10,7 @@ public class Note {
     private Long id;
     private Long userId;
     private String title;
-    private String source;
+    private Long sourceId;
     private String description;
     private Long areaId;
     private Long noteTypeId;
@@ -21,11 +21,11 @@ public class Note {
         // Default constructor
     }
     
-    public Note(Long userId, String title, String source, String description, 
+    public Note(Long userId, String title, Long sourceId, String description, 
                 Long areaId, Long noteTypeId) {
         this.userId = userId;
         this.title = title;
-        this.source = source;
+        this.sourceId = sourceId;
         this.description = description;
         this.areaId = areaId;
         this.noteTypeId = noteTypeId;
@@ -58,12 +58,12 @@ public class Note {
         this.title = title;
     }
     
-    public String getSource() {
-        return source;
+    public Long getSourceId() {
+        return sourceId;
     }
     
-    public void setSource(String source) {
-        this.source = source;
+    public void setSourceId(Long sourceId) {
+        this.sourceId = sourceId;
     }
     
     public String getDescription() {
@@ -112,7 +112,7 @@ public class Note {
                 "id=" + id +
                 ", userId=" + userId +
                 ", title='" + title + '\'' +
-                ", source='" + source + '\'' +
+                ", sourceId=" + sourceId +
                 ", areaId=" + areaId +
                 ", noteTypeId=" + noteTypeId +
                 '}';

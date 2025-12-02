@@ -3,12 +3,15 @@ package com.portfolio.defstuf.services.note;
 import com.portfolio.defstuf.models.note.Note;
 import com.portfolio.defstuf.models.note.NoteImage;
 import com.portfolio.defstuf.models.note.NoteType;
+import com.portfolio.defstuf.models.note.Source;
 import com.portfolio.defstuf.repository.note.ImageRepository;
 import com.portfolio.defstuf.repository.note.NoteRepository;
 import com.portfolio.defstuf.repository.note.NoteTypeRepository;
+import com.portfolio.defstuf.repository.note.SourceRepository;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Service for note operations
@@ -16,15 +19,17 @@ import java.util.List;
  */
 public class NoteService {
     
-    private static final String DEFAULT_SOURCE = "personal";
+    private static final String DEFAULT_SOURCE_CODE = "personal";
     
     private final NoteRepository noteRepository;
     private final NoteTypeRepository noteTypeRepository;
+    private final SourceRepository sourceRepository;
     private final ImageRepository imageRepository;
     
     public NoteService() {
         this.noteRepository = new NoteRepository();
         this.noteTypeRepository = new NoteTypeRepository();
+        this.sourceRepository = new SourceRepository();
         this.imageRepository = new ImageRepository();
     }
     
@@ -33,7 +38,7 @@ public class NoteService {
      * 
      * @param userId The user ID creating the note
      * @param title The note title (REQUIRED, cannot be empty)
-     * @param source The note source (optional, defaults to "personal" if empty)
+     * @param sourceId The note source ID (optional, defaults to "personal" source if null)
      * @param description The note description (optional, can be empty)
      * @param areaId The area ID (optional)
      * @param noteTypeId The note type ID (optional)
@@ -43,7 +48,7 @@ public class NoteService {
      * @return The created note
      * @throws NoteException If validation fails or database error occurs
      */
-    public Note createNote(Long userId, String title, String source, String description,
+    public Note createNote(Long userId, String title, Long sourceId, String description,
                           Long areaId, Long noteTypeId, List<String> imagePaths, 
                           List<Long> fileSizes, List<String> mimeTypes) throws NoteException {
         // Validate title (REQUIRED)
@@ -51,10 +56,16 @@ public class NoteService {
             throw new NoteException("Note title cannot be empty");
         }
         
-        // Set default source if empty or null
-        String finalSource = (source == null || source.trim().isEmpty()) 
-            ? DEFAULT_SOURCE 
-            : source.trim();
+        // Set default source if null
+        Long finalSourceId = sourceId;
+        if (finalSourceId == null) {
+            try {
+                Optional<Source> personalSource = sourceRepository.findByCode(DEFAULT_SOURCE_CODE);
+                finalSourceId = personalSource.map(Source::getId).orElse(null);
+            } catch (SQLException e) {
+                throw new NoteException("Error getting default source: " + e.getMessage(), e);
+            }
+        }
         
         // Description can be null or empty (no validation needed)
         String finalDescription = (description == null || description.trim().isEmpty()) 
@@ -65,7 +76,7 @@ public class NoteService {
         Note note = new Note(
             userId, 
             title.trim(), 
-            finalSource,  // Always has a value (default "personal" if empty)
+            finalSourceId,  // Can be null if "personal" source doesn't exist
             finalDescription,  // Can be null
             areaId, 
             noteTypeId
@@ -113,6 +124,28 @@ public class NoteService {
             return noteTypeRepository.createIfNotExists(name);
         } catch (SQLException e) {
             throw new NoteException("Error getting/creating note type: " + e.getMessage(), e);
+        }
+    }
+    
+    /**
+     * Gets all available sources
+     */
+    public List<Source> getAllSources() throws NoteException {
+        try {
+            return sourceRepository.findAll();
+        } catch (SQLException e) {
+            throw new NoteException("Error retrieving sources: " + e.getMessage(), e);
+        }
+    }
+    
+    /**
+     * Gets a source by code (useful for default values)
+     */
+    public Optional<Source> getSourceByCode(String code) throws NoteException {
+        try {
+            return sourceRepository.findByCode(code);
+        } catch (SQLException e) {
+            throw new NoteException("Error getting source by code: " + e.getMessage(), e);
         }
     }
     

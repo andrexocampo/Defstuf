@@ -31,11 +31,11 @@
             <!-- Source Section -->
             <VBox spacing="5">
                <Label text="Source:" style="-fx-font-size: 14px; -fx-font-weight: bold;" />
-               <TextField fx:id="sourceField" promptText="Enter source (default: personal)..." 
-                          style="-fx-font-size: 14px;" />
+               <ComboBox fx:id="sourceComboBox" promptText="Select source..." 
+                         style="-fx-font-size: 14px;" />
             </VBox>
             
-            <!-- Area and Note Type Section -->
+            <!-- Area, Source and Note Type Section -->
             <HBox spacing="20">
                <VBox spacing="5" HBox.hgrow="ALWAYS">
                   <Label text="Area:" style="-fx-font-size: 14px; -fx-font-weight: bold;" />

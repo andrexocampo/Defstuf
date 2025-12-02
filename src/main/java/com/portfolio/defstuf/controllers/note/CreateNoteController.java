@@ -2,6 +2,7 @@ package com.portfolio.defstuf.controllers.note;
 
 import com.portfolio.defstuf.models.area.Area;
 import com.portfolio.defstuf.models.note.NoteType;
+import com.portfolio.defstuf.models.note.Source;
 import com.portfolio.defstuf.models.screenshot.Screenshot;
 import com.portfolio.defstuf.services.area.AreaService;
 import com.portfolio.defstuf.services.note.NoteService;
@@ -45,7 +46,7 @@ public class CreateNoteController {
     private TextField titleField;
     
     @FXML
-    private TextField sourceField;
+    private ComboBox<Source> sourceComboBox;
     
     @FXML
     private TextArea descriptionArea;
@@ -103,6 +104,9 @@ public class CreateNoteController {
         // Load areas
         loadAreas();
         
+        // Load sources and set default to "personal"
+        loadSources();
+        
         // Load note types and set default to "Definition"
         loadNoteTypes();
         
@@ -146,6 +150,54 @@ public class CreateNoteController {
             });
         } catch (Exception e) {
             System.err.println("Error loading areas: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Loads sources from database and sets "Personal" as default
+     */
+    private void loadSources() {
+        try {
+            List<Source> sources = noteService.getAllSources();
+            sourceComboBox.getItems().clear();
+            sourceComboBox.getItems().addAll(sources);
+            
+            // Set cell factory to display source name
+            sourceComboBox.setCellFactory(param -> new ListCell<Source>() {
+                @Override
+                protected void updateItem(Source item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setText(null);
+                    } else {
+                        setText(item.getName());
+                    }
+                }
+            });
+            
+            // Set button cell to display source name
+            sourceComboBox.setButtonCell(new ListCell<Source>() {
+                @Override
+                protected void updateItem(Source item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setText("Select Source");
+                    } else {
+                        setText(item.getName());
+                    }
+                }
+            });
+            
+            // Set "Personal" as default selection
+            for (Source source : sources) {
+                if ("personal".equalsIgnoreCase(source.getCode())) {
+                    sourceComboBox.getSelectionModel().select(source);
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error loading sources: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -514,7 +566,6 @@ public class CreateNoteController {
     private void saveNote() {
         // Get form values
         String title = titleField.getText().trim();
-        String source = sourceField.getText().trim();
         String description = descriptionArea.getText().trim();
         
         // Validate title (REQUIRED)
@@ -522,6 +573,22 @@ public class CreateNoteController {
             showError("Please enter a title for the note");
             titleField.requestFocus();
             return;
+        }
+        
+        // Get selected source (or use "personal" as default)
+        Source selectedSource = sourceComboBox.getSelectionModel().getSelectedItem();
+        Long sourceId = null;
+        
+        if (selectedSource != null) {
+            sourceId = selectedSource.getId();
+        } else {
+            // Fallback: try to get "personal" source
+            try {
+                java.util.Optional<Source> personalSource = noteService.getSourceByCode("personal");
+                sourceId = personalSource.map(Source::getId).orElse(null);
+            } catch (Exception e) {
+                System.err.println("Error getting default source: " + e.getMessage());
+            }
         }
         
         // Get selected area
@@ -575,7 +642,7 @@ public class CreateNoteController {
             noteService.createNote(
                 userId,
                 title,
-                source,  // Will default to "personal" if empty in service
+                sourceId,  // Will default to "personal" if null in service
                 description,  // Can be null/empty
                 areaId,
                 noteTypeId,
@@ -598,9 +665,16 @@ public class CreateNoteController {
      */
     private void clearForm() {
         titleField.clear();
-        sourceField.clear();
         descriptionArea.clear();
         areaComboBox.getSelectionModel().clearSelection();
+        
+        // Reset source to "Personal"
+        for (Source source : sourceComboBox.getItems()) {
+            if ("personal".equalsIgnoreCase(source.getCode())) {
+                sourceComboBox.getSelectionModel().select(source);
+                break;
+            }
+        }
         
         // Reset note type to "Definition"
         for (NoteType noteType : noteTypeComboBox.getItems()) {

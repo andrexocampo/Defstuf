@@ -17,7 +17,7 @@ public class NoteRepository {
      * Saves a new note to the database
      */
     public Note save(Note note) throws SQLException {
-        String sql = "INSERT INTO notes (user_id, title, source, description, area_id, note_type_id, created_at, updated_at) " +
+        String sql = "INSERT INTO notes (user_id, title, source_id, description, area_id, note_type_id, created_at, updated_at) " +
                      "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
@@ -25,7 +25,13 @@ public class NoteRepository {
             
             stmt.setLong(1, note.getUserId());
             stmt.setString(2, note.getTitle());
-            stmt.setString(3, note.getSource());
+            
+            if (note.getSourceId() != null) {
+                stmt.setLong(3, note.getSourceId());
+            } else {
+                stmt.setNull(3, Types.BIGINT);
+            }
+            
             stmt.setString(4, note.getDescription());
             
             if (note.getAreaId() != null) {
@@ -67,7 +73,7 @@ public class NoteRepository {
      * Finds a note by ID
      */
     public Note findById(Long id) throws SQLException {
-        String sql = "SELECT id, user_id, title, source, description, area_id, note_type_id, created_at, updated_at " +
+        String sql = "SELECT id, user_id, title, source_id, description, area_id, note_type_id, created_at, updated_at " +
                      "FROM notes WHERE id = ?";
         
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
@@ -88,7 +94,7 @@ public class NoteRepository {
      * Finds all notes for a specific user
      */
     public List<Note> findByUserId(Long userId) throws SQLException {
-        String sql = "SELECT id, user_id, title, source, description, area_id, note_type_id, created_at, updated_at " +
+        String sql = "SELECT id, user_id, title, source_id, description, area_id, note_type_id, created_at, updated_at " +
                      "FROM notes WHERE user_id = ? ORDER BY created_at DESC";
         List<Note> notes = new ArrayList<>();
         
@@ -114,7 +120,14 @@ public class NoteRepository {
         note.setId(rs.getLong("id"));
         note.setUserId(rs.getLong("user_id"));
         note.setTitle(rs.getString("title"));
-        note.setSource(rs.getString("source"));
+        
+        Long sourceId = rs.getLong("source_id");
+        if (!rs.wasNull()) {
+            note.setSourceId(sourceId);
+        } else {
+            note.setSourceId(null);
+        }
+        
         note.setDescription(rs.getString("description"));
         
         Long areaId = rs.getLong("area_id");
