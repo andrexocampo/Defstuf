@@ -6,6 +6,7 @@ import com.portfolio.defstuf.models.note.Source;
 import com.portfolio.defstuf.models.screenshot.Screenshot;
 import com.portfolio.defstuf.services.area.AreaService;
 import com.portfolio.defstuf.services.note.NoteService;
+import com.portfolio.defstuf.services.note.SourceService;
 import com.portfolio.defstuf.services.screenshot.ScreenshotCaptureService;
 import com.portfolio.defstuf.session.SessionManager;
 import com.portfolio.defstuf.util.ImageFileManager;
@@ -16,6 +17,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -24,11 +26,14 @@ import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.util.Pair;
 
 import java.awt.AWTException;
 import java.awt.image.BufferedImage;
@@ -47,6 +52,12 @@ public class CreateNoteController {
     
     @FXML
     private ComboBox<Source> sourceComboBox;
+    
+    @FXML
+    private Button addSourceButton;
+    
+    @FXML
+    private Button viewSourcesButton;
     
     @FXML
     private TextArea descriptionArea;
@@ -77,6 +88,7 @@ public class CreateNoteController {
     private ScreenshotCaptureService captureService;
     private AreaService areaService;
     private NoteService noteService;
+    private SourceService sourceService;
     
     // List to store multiple screenshots
     private List<WritableImage> screenshotsFX = new ArrayList<>();
@@ -100,6 +112,7 @@ public class CreateNoteController {
         captureService = new ScreenshotCaptureService();
         areaService = new AreaService();
         noteService = new NoteService();
+        sourceService = new SourceService();
         
         // Load areas
         loadAreas();
@@ -159,7 +172,7 @@ public class CreateNoteController {
      */
     private void loadSources() {
         try {
-            List<Source> sources = noteService.getAllSources();
+            List<Source> sources = sourceService.getAllSources();
             sourceComboBox.getItems().clear();
             sourceComboBox.getItems().addAll(sources);
             
@@ -584,7 +597,7 @@ public class CreateNoteController {
         } else {
             // Fallback: try to get "personal" source
             try {
-                java.util.Optional<Source> personalSource = noteService.getSourceByCode("personal");
+                java.util.Optional<Source> personalSource = sourceService.getSourceByCode("personal");
                 sourceId = personalSource.map(Source::getId).orElse(null);
             } catch (Exception e) {
                 System.err.println("Error getting default source: " + e.getMessage());
@@ -734,5 +747,146 @@ public class CreateNoteController {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+    
+    /**
+     * Handles the "Add Source" button click
+     * Shows a dialog to create a new source
+     */
+    @FXML
+    private void handleAddSource() {
+        // Create a custom dialog
+        Dialog<Pair<String, String>> dialog = new Dialog<>();
+        dialog.setTitle("Add New Source");
+        dialog.setHeaderText("Enter source information");
+        dialog.initModality(Modality.APPLICATION_MODAL);
+        
+        // Set the button types
+        ButtonType createButtonType = new ButtonType("Create", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(createButtonType, ButtonType.CANCEL);
+        
+        // Create the input fields
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20, 150, 10, 10));
+        
+        TextField nameField = new TextField();
+        nameField.setPromptText("e.g., Book: Clean Code, Page: Stack Overflow");
+        TextField codeField = new TextField();
+        codeField.setPromptText("Auto-generated if empty");
+        
+        grid.add(new Label("Name:"), 0, 0);
+        grid.add(nameField, 1, 0);
+        grid.add(new Label("Code (optional):"), 0, 1);
+        grid.add(codeField, 1, 1);
+        
+        dialog.getDialogPane().setContent(grid);
+        
+        // Request focus on name field
+        Platform.runLater(() -> nameField.requestFocus());
+        
+        // Enable/Disable create button depending on whether a name was entered
+        Button createButton = (Button) dialog.getDialogPane().lookupButton(createButtonType);
+        createButton.setDisable(true);
+        
+        // Validate that name is not empty
+        nameField.textProperty().addListener((observable, oldValue, newValue) -> {
+            createButton.setDisable(newValue.trim().isEmpty());
+        });
+        
+        // Convert the result to a pair of strings when the create button is clicked
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == createButtonType) {
+                return new Pair<>(nameField.getText().trim(), codeField.getText().trim());
+            }
+            return null;
+        });
+        
+        // Show dialog and process result
+        java.util.Optional<Pair<String, String>> result = dialog.showAndWait();
+        
+        result.ifPresent(pair -> {
+            String name = pair.getKey();
+            String code = pair.getValue();
+            
+            if (name.isEmpty()) {
+                showError("Source name cannot be empty");
+                return;
+            }
+            
+            try {
+                // Create the source
+                Source newSource = sourceService.createSource(name, code.isEmpty() ? null : code);
+                
+                // Refresh sources list
+                loadSources();
+                
+                // Select the newly created source
+                sourceComboBox.getSelectionModel().select(newSource);
+                
+                showInfo("Source '" + name + "' created successfully!");
+            } catch (SourceService.SourceException e) {
+                showError("Error creating source: " + e.getMessage());
+            }
+        });
+    }
+    
+    /**
+     * Handles the "View Sources" button click
+     * Opens a floating window to manage sources
+     */
+    @FXML
+    private void handleViewSources() {
+        try {
+            // Get the current stage (either primaryStage or from scene)
+            Stage ownerStage = primaryStage;
+            if (ownerStage == null && sourceComboBox != null && sourceComboBox.getScene() != null) {
+                ownerStage = (Stage) sourceComboBox.getScene().getWindow();
+            }
+            
+            // Create and configure the floating window
+            Stage floatingStage = new Stage();
+            floatingStage.initModality(javafx.stage.Modality.WINDOW_MODAL);
+            if (ownerStage != null) {
+                floatingStage.initOwner(ownerStage);
+            }
+            floatingStage.setTitle("Sources");
+            floatingStage.setResizable(true);
+            
+            // Load the FXML
+            FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/com/portfolio/defstuf/views/note/ViewSourcesView.fxml")
+            );
+            Parent root = loader.load();
+            
+            // Get controller and set callback to refresh sources list
+            ViewSourcesController controller = loader.getController();
+            controller.setOnSourceUpdated(() -> {
+                // Refresh sources in CreateNoteController when a source is updated/deleted
+                loadSources();
+            });
+            
+            // Create scene
+            Scene scene = new Scene(root, 600, 500);
+            scene.getStylesheets().add(
+                getClass().getResource("/com/portfolio/defstuf/styles/main.css").toExternalForm()
+            );
+            
+            floatingStage.setScene(scene);
+            
+            // Center the window relative to owner
+            if (ownerStage != null) {
+                floatingStage.setX(ownerStage.getX() + (ownerStage.getWidth() - 600) / 2);
+                floatingStage.setY(ownerStage.getY() + (ownerStage.getHeight() - 500) / 2);
+            }
+            
+            // Show the floating window
+            floatingStage.show();
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            showError("Error opening View Sources window: " + e.getMessage());
+        }
     }
 }
