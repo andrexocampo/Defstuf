@@ -1,6 +1,8 @@
 package com.portfolio.defstuf.repository;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.Statement;
 
 /**
@@ -216,6 +218,46 @@ public class DatabaseInitializer {
     }
     
     /**
+     * Initializes default data (e.g., default note types)
+     */
+    private static void initializeDefaultData() {
+        try {
+            initializeDefaultNoteTypes();
+        } catch (Exception e) {
+            System.err.println("✗ Error initializing default data: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Creates default note types if they don't exist
+     */
+    private static void initializeDefaultNoteTypes() throws Exception {
+        String[] defaultNoteTypes = {"Definition"};
+        
+        try (Connection conn = DatabaseConnection.getInstance().getConnection()) {
+            for (String noteTypeName : defaultNoteTypes) {
+                // Check if note type already exists
+                String checkSql = "SELECT COUNT(*) FROM note_type WHERE name = ?";
+                try (PreparedStatement checkStmt = conn.prepareStatement(checkSql)) {
+                    checkStmt.setString(1, noteTypeName);
+                    try (ResultSet rs = checkStmt.executeQuery()) {
+                        if (rs.next() && rs.getInt(1) == 0) {
+                            // Note type doesn't exist, create it
+                            String insertSql = "INSERT INTO note_type (name) VALUES (?)";
+                            try (PreparedStatement insertStmt = conn.prepareStatement(insertSql)) {
+                                insertStmt.setString(1, noteTypeName);
+                                insertStmt.executeUpdate();
+                                System.out.println("✓ Default note type '" + noteTypeName + "' created");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    /**
      * Initializes all database tables in the correct order
      * Order is important to respect foreign key dependencies
      */
@@ -241,6 +283,9 @@ public class DatabaseInitializer {
             createImagesTable();
             createQuestionsTable();
             createSharedNotesTable();
+            
+            // Step 4: Initialize default data
+            initializeDefaultData();
             
             System.out.println("\n=========================================");
             System.out.println("  DATABASE INITIALIZATION COMPLETED");

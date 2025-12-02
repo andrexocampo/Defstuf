@@ -47,6 +47,9 @@ Thumbs.db
 *.tar.gz
 *.rar
 
+# Images directory (user-generated screenshots)
+images/
+
 
 
 

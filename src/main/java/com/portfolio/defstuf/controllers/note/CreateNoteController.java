@@ -1,11 +1,19 @@
 package com.portfolio.defstuf.controllers.note;
 
+import com.portfolio.defstuf.models.area.Area;
+import com.portfolio.defstuf.models.note.NoteType;
 import com.portfolio.defstuf.models.screenshot.Screenshot;
+import com.portfolio.defstuf.services.area.AreaService;
+import com.portfolio.defstuf.services.note.NoteService;
 import com.portfolio.defstuf.services.screenshot.ScreenshotCaptureService;
+import com.portfolio.defstuf.session.SessionManager;
+import com.portfolio.defstuf.util.ImageFileManager;
 import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -16,16 +24,20 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import java.awt.AWTException;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Controller for Create Note view
- * Handles note creation with title, description, and screenshot functionality
+ * Handles note creation with title, description, source, area, note type, and multiple screenshots
  */
 public class CreateNoteController {
     
@@ -33,19 +45,25 @@ public class CreateNoteController {
     private TextField titleField;
     
     @FXML
+    private TextField sourceField;
+    
+    @FXML
     private TextArea descriptionArea;
     
     @FXML
-    private ImageView screenshotImageView;
+    private ComboBox<Area> areaComboBox;
     
     @FXML
-    private Label screenshotPlaceholderLabel;
+    private ComboBox<NoteType> noteTypeComboBox;
+    
+    @FXML
+    private VBox screenshotsContainer;
+    
+    @FXML
+    private Label screenshotsPlaceholderLabel;
     
     @FXML
     private Button captureButton;
-    
-    @FXML
-    private Button removeScreenshotButton;
     
     @FXML
     private Button saveButton;
@@ -56,8 +74,12 @@ public class CreateNoteController {
     private Stage primaryStage;
     private Stage captureStage;
     private ScreenshotCaptureService captureService;
-    private WritableImage currentScreenshot;
-    private BufferedImage currentBufferedImage;
+    private AreaService areaService;
+    private NoteService noteService;
+    
+    // List to store multiple screenshots
+    private List<WritableImage> screenshotsFX = new ArrayList<>();
+    private List<BufferedImage> screenshotsBuffered = new ArrayList<>();
     
     // Variables for capture UI
     private Canvas canvas;
@@ -75,10 +97,109 @@ public class CreateNoteController {
     @FXML
     private void initialize() {
         captureService = new ScreenshotCaptureService();
+        areaService = new AreaService();
+        noteService = new NoteService();
         
-        // Hide screenshot image initially
-        screenshotImageView.setVisible(false);
-        screenshotPlaceholderLabel.setVisible(true);
+        // Load areas
+        loadAreas();
+        
+        // Load note types and set default to "Definition"
+        loadNoteTypes();
+        
+        // Update screenshots UI
+        updateScreenshotsUI();
+    }
+    
+    /**
+     * Loads areas from database into the ComboBox
+     */
+    private void loadAreas() {
+        try {
+            List<Area> areas = areaService.getAllAreas();
+            areaComboBox.getItems().clear();
+            areaComboBox.getItems().addAll(areas);
+            
+            // Set cell factory to display area name
+            areaComboBox.setCellFactory(param -> new ListCell<Area>() {
+                @Override
+                protected void updateItem(Area item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setText(null);
+                    } else {
+                        setText(item.getName());
+                    }
+                }
+            });
+            
+            // Set button cell to display area name
+            areaComboBox.setButtonCell(new ListCell<Area>() {
+                @Override
+                protected void updateItem(Area item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setText(null);
+                    } else {
+                        setText(item.getName());
+                    }
+                }
+            });
+        } catch (Exception e) {
+            System.err.println("Error loading areas: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Loads note types from database and sets "Definition" as default
+     */
+    private void loadNoteTypes() {
+        try {
+            // Ensure "Definition" exists
+            noteService.getOrCreateNoteType("Definition");
+            
+            // Load all note types
+            List<NoteType> noteTypes = noteService.getAllNoteTypes();
+            noteTypeComboBox.getItems().clear();
+            noteTypeComboBox.getItems().addAll(noteTypes);
+            
+            // Set cell factory to display note type name (NoteType.toString() already returns name)
+            noteTypeComboBox.setCellFactory(param -> new ListCell<NoteType>() {
+                @Override
+                protected void updateItem(NoteType item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setText(null);
+                    } else {
+                        setText(item.getName());
+                    }
+                }
+            });
+            
+            // Set button cell to display note type name
+            noteTypeComboBox.setButtonCell(new ListCell<NoteType>() {
+                @Override
+                protected void updateItem(NoteType item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setText(null);
+                    } else {
+                        setText(item.getName());
+                    }
+                }
+            });
+            
+            // Set "Definition" as default selection
+            for (NoteType noteType : noteTypes) {
+                if ("Definition".equalsIgnoreCase(noteType.getName())) {
+                    noteTypeComboBox.getSelectionModel().select(noteType);
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error loading note types: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
     
     /**
@@ -173,7 +294,7 @@ public class CreateNoteController {
         
         // Control buttons
         HBox controls = new HBox(10);
-        controls.setPadding(new javafx.geometry.Insets(10));
+        controls.setPadding(new Insets(10));
         controls.setStyle("-fx-background-color: rgba(0, 0, 0, 0.7); -fx-background-radius: 5;");
         
         Button cancelButton = new Button("Cancel");
@@ -185,9 +306,9 @@ public class CreateNoteController {
         captureButton.setOnAction(e -> captureSelectedArea());
         
         controls.getChildren().addAll(cancelButton, captureButton);
-        controls.setAlignment(javafx.geometry.Pos.CENTER);
+        controls.setAlignment(Pos.CENTER);
         root.setBottom(controls);
-        BorderPane.setAlignment(controls, javafx.geometry.Pos.CENTER);
+        BorderPane.setAlignment(controls, Pos.CENTER);
         
         Scene scene = new Scene(root, fxScreenshot.getWidth(), fxScreenshot.getHeight());
         captureStage.setScene(scene);
@@ -298,15 +419,12 @@ public class CreateNoteController {
             BufferedImage croppedImage = captureService.cropImage(screenshot, selectedArea);
             WritableImage croppedFXImage = SwingFXUtils.toFXImage(croppedImage, null);
             
-            // Store the captured image
-            currentScreenshot = croppedFXImage;
-            currentBufferedImage = croppedImage;
+            // Add to screenshots list
+            screenshotsFX.add(croppedFXImage);
+            screenshotsBuffered.add(croppedImage);
             
-            // Update UI to show the screenshot
-            screenshotImageView.setImage(currentScreenshot);
-            screenshotImageView.setVisible(true);
-            screenshotPlaceholderLabel.setVisible(false);
-            removeScreenshotButton.setDisable(false);
+            // Update UI to show all screenshots
+            updateScreenshotsUI();
             
             // Close capture window
             captureStage.close();
@@ -323,6 +441,63 @@ public class CreateNoteController {
         }
     }
     
+    /**
+     * Updates the screenshots UI to show all captured screenshots
+     */
+    private void updateScreenshotsUI() {
+        screenshotsContainer.getChildren().clear();
+        
+        if (screenshotsFX.isEmpty()) {
+            screenshotsPlaceholderLabel.setVisible(true);
+            screenshotsContainer.getChildren().add(screenshotsPlaceholderLabel);
+        } else {
+            screenshotsPlaceholderLabel.setVisible(false);
+            
+            for (int i = 0; i < screenshotsFX.size(); i++) {
+                final int index = i;
+                WritableImage image = screenshotsFX.get(i);
+                
+                // Create container for each screenshot
+                BorderPane imageContainer = new BorderPane();
+                imageContainer.setStyle("-fx-background-color: white; -fx-border-color: #cccccc; -fx-border-width: 1; -fx-padding: 5;");
+                
+                // Image view
+                ImageView imageView = new ImageView(image);
+                imageView.setFitWidth(400);
+                imageView.setFitHeight(250);
+                imageView.setPreserveRatio(true);
+                imageView.setSmooth(true);
+                
+                imageContainer.setCenter(imageView);
+                
+                // Remove button
+                HBox buttonContainer = new HBox();
+                buttonContainer.setAlignment(Pos.CENTER_RIGHT);
+                buttonContainer.setPadding(new Insets(5));
+                
+                Button removeButton = new Button("Remove");
+                removeButton.setStyle("-fx-background-color: #d32f2f; -fx-text-fill: white; -fx-padding: 5 10;");
+                removeButton.setOnAction(e -> removeScreenshot(index));
+                
+                buttonContainer.getChildren().add(removeButton);
+                imageContainer.setBottom(buttonContainer);
+                
+                screenshotsContainer.getChildren().add(imageContainer);
+            }
+        }
+    }
+    
+    /**
+     * Removes a screenshot at the specified index
+     */
+    private void removeScreenshot(int index) {
+        if (index >= 0 && index < screenshotsFX.size()) {
+            screenshotsFX.remove(index);
+            screenshotsBuffered.remove(index);
+            updateScreenshotsUI();
+        }
+    }
+    
     private void cancelCapture() {
         if (captureStage != null) {
             captureStage.close();
@@ -333,44 +508,112 @@ public class CreateNoteController {
     }
     
     /**
-     * Removes the current screenshot
-     */
-    @FXML
-    private void removeScreenshot() {
-        currentScreenshot = null;
-        currentBufferedImage = null;
-        screenshotImageView.setImage(null);
-        screenshotImageView.setVisible(false);
-        screenshotPlaceholderLabel.setVisible(true);
-        removeScreenshotButton.setDisable(true);
-    }
-    
-    /**
-     * Saves the note (currently just validation, will integrate with Note entity later)
+     * Saves the note to the database
      */
     @FXML
     private void saveNote() {
+        // Get form values
         String title = titleField.getText().trim();
+        String source = sourceField.getText().trim();
         String description = descriptionArea.getText().trim();
         
-        // Validation
+        // Validate title (REQUIRED)
         if (title.isEmpty()) {
             showError("Please enter a title for the note");
             titleField.requestFocus();
             return;
         }
         
-        // TODO: Save to database when Note entity is implemented
-        // For now, just show a success message
-        String message = "Note saved successfully!\n\n";
-        message += "Title: " + title + "\n";
-        message += "Description: " + (description.isEmpty() ? "(empty)" : description) + "\n";
-        message += "Screenshot: " + (currentScreenshot != null ? "Yes" : "No");
+        // Get selected area
+        Area selectedArea = areaComboBox.getSelectionModel().getSelectedItem();
+        Long areaId = selectedArea != null ? selectedArea.getId() : null;
         
-        showInfo(message);
+        // Get selected note type (or use "Definition" as default)
+        NoteType selectedNoteType = noteTypeComboBox.getSelectionModel().getSelectedItem();
+        Long noteTypeId = null;
         
-        // TODO: Clear form after saving
-        // clearForm();
+        if (selectedNoteType != null) {
+            noteTypeId = selectedNoteType.getId();
+        } else {
+            // Fallback: ensure "Definition" exists and use it
+            try {
+                NoteType definitionType = noteService.getOrCreateNoteType("Definition");
+                noteTypeId = definitionType.getId();
+            } catch (Exception e) {
+                System.err.println("Error getting default note type: " + e.getMessage());
+            }
+        }
+        
+        // Get current user ID
+        Long userId = SessionManager.getInstance().getCurrentUserId();
+        if (userId == null) {
+            showError("You must be logged in to create a note");
+            return;
+        }
+        
+        // Save images to disk and prepare data for database
+        List<String> imagePaths = new ArrayList<>();
+        List<Long> fileSizes = new ArrayList<>();
+        List<String> mimeTypes = new ArrayList<>();
+        
+        try {
+            for (BufferedImage bufferedImage : screenshotsBuffered) {
+                String imagePath = ImageFileManager.saveImage(bufferedImage, "image/png");
+                long fileSize = ImageFileManager.getFileSize(imagePath);
+                
+                imagePaths.add(imagePath);
+                fileSizes.add(fileSize);
+                mimeTypes.add("image/png");
+            }
+        } catch (IOException e) {
+            showError("Error saving images: " + e.getMessage());
+            return;
+        }
+        
+        // Create and save note
+        try {
+            noteService.createNote(
+                userId,
+                title,
+                source,  // Will default to "personal" if empty in service
+                description,  // Can be null/empty
+                areaId,
+                noteTypeId,
+                imagePaths,
+                fileSizes,
+                mimeTypes
+            );
+            
+            showInfo("Note saved successfully!");
+            clearForm();
+            
+        } catch (NoteService.NoteException e) {
+            showError("Error saving note: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Clears the form after successful save
+     */
+    private void clearForm() {
+        titleField.clear();
+        sourceField.clear();
+        descriptionArea.clear();
+        areaComboBox.getSelectionModel().clearSelection();
+        
+        // Reset note type to "Definition"
+        for (NoteType noteType : noteTypeComboBox.getItems()) {
+            if ("Definition".equalsIgnoreCase(noteType.getName())) {
+                noteTypeComboBox.getSelectionModel().select(noteType);
+                break;
+            }
+        }
+        
+        // Clear screenshots
+        screenshotsFX.clear();
+        screenshotsBuffered.clear();
+        updateScreenshotsUI();
     }
     
     /**
@@ -419,4 +662,3 @@ public class CreateNoteController {
         alert.showAndWait();
     }
 }
-

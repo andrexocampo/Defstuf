@@ -28,31 +28,50 @@
                           style="-fx-font-size: 14px;" />
             </VBox>
             
+            <!-- Source Section -->
+            <VBox spacing="5">
+               <Label text="Source:" style="-fx-font-size: 14px; -fx-font-weight: bold;" />
+               <TextField fx:id="sourceField" promptText="Enter source (default: personal)..." 
+                          style="-fx-font-size: 14px;" />
+            </VBox>
+            
+            <!-- Area and Note Type Section -->
+            <HBox spacing="20">
+               <VBox spacing="5" HBox.hgrow="ALWAYS">
+                  <Label text="Area:" style="-fx-font-size: 14px; -fx-font-weight: bold;" />
+                  <ComboBox fx:id="areaComboBox" promptText="Select area (optional)..." 
+                            style="-fx-font-size: 14px;" />
+               </VBox>
+               
+               <VBox spacing="5" HBox.hgrow="ALWAYS">
+                  <Label text="Note Type:" style="-fx-font-size: 14px; -fx-font-weight: bold;" />
+                  <ComboBox fx:id="noteTypeComboBox" promptText="Select note type..." 
+                            style="-fx-font-size: 14px;" />
+               </VBox>
+            </HBox>
+            
             <!-- Description Section -->
             <VBox spacing="5">
                <Label text="Description:" style="-fx-font-size: 14px; -fx-font-weight: bold;" />
-               <TextArea fx:id="descriptionArea" promptText="Enter note description..." 
+               <TextArea fx:id="descriptionArea" promptText="Enter note description (optional)..." 
                          wrapText="true" prefRowCount="5"
                          style="-fx-font-size: 14px;" />
             </VBox>
             
-            <!-- Screenshot Section -->
+            <!-- Screenshots Section -->
             <VBox spacing="10">
-               <Label text="Screenshot:" style="-fx-font-size: 14px; -fx-font-weight: bold;" />
+               <Label text="Screenshots:" style="-fx-font-size: 14px; -fx-font-weight: bold;" />
                
-               <!-- Screenshot Preview Area -->
+               <!-- Screenshots Container -->
                <BorderPane style="-fx-background-color: white; -fx-border-color: #cccccc; -fx-border-width: 1;">
                   <center>
-                     <StackPane minHeight="300" alignment="CENTER">
-                        <ImageView fx:id="screenshotImageView" 
-                                   fitWidth="600" 
-                                   fitHeight="300" 
-                                   preserveRatio="true"
-                                   style="-fx-background-color: #f9f9f9;" />
-                        <Label fx:id="screenshotPlaceholderLabel" 
-                               text="No screenshot captured yet" 
-                               style="-fx-text-fill: #999999;" />
-                     </StackPane>
+                     <ScrollPane fitToWidth="true" minHeight="300" maxHeight="400">
+                        <VBox fx:id="screenshotsContainer" spacing="10" style="-fx-padding: 10;">
+                           <Label fx:id="screenshotsPlaceholderLabel" 
+                                  text="No screenshots captured yet" 
+                                  style="-fx-text-fill: #999999; -fx-alignment: CENTER;" />
+                        </VBox>
+                     </ScrollPane>
                   </center>
                </BorderPane>
                
@@ -61,12 +80,6 @@
                           text="Capture Screenshot" 
                           onAction="#captureScreenshot"
                           style="-fx-font-size: 14px; -fx-padding: 8 16; -fx-background-color: #0078d4; -fx-text-fill: white;" />
-                  
-                  <Button fx:id="removeScreenshotButton" 
-                          text="Remove Screenshot" 
-                          onAction="#removeScreenshot"
-                          disable="true"
-                          style="-fx-font-size: 14px; -fx-padding: 8 16; -fx-background-color: #6c757d; -fx-text-fill: white;" />
                </HBox>
             </VBox>
             
