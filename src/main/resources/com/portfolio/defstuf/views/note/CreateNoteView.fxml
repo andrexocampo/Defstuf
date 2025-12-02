@@ -31,15 +31,23 @@
             <!-- Source Section -->
             <VBox spacing="5">
                <Label text="Source:" style="-fx-font-size: 14px; -fx-font-weight: bold;" />
-               <ComboBox fx:id="sourceComboBox" promptText="Select source..." 
-                         style="-fx-font-size: 14px;" />
+               <HBox spacing="10">
+                  <ComboBox fx:id="sourceComboBox" promptText="Select source..." 
+                            style="-fx-font-size: 14px;" HBox.hgrow="ALWAYS" />
+                  <Button fx:id="addSourceButton" text="Add Source" 
+                          onAction="#handleAddSource"
+                          style="-fx-font-size: 14px; -fx-padding: 5 10; -fx-background-color: #007bff; -fx-text-fill: white;" />
+                  <Button fx:id="viewSourcesButton" text="View Sources" 
+                          onAction="#handleViewSources"
+                          style="-fx-font-size: 14px; -fx-padding: 5 10; -fx-background-color: #6c757d; -fx-text-fill: white;" />
+               </HBox>
             </VBox>
             
             <!-- Area, Source and Note Type Section -->
             <HBox spacing="20">
                <VBox spacing="5" HBox.hgrow="ALWAYS">
                   <Label text="Area:" style="-fx-font-size: 14px; -fx-font-weight: bold;" />
-                  <ComboBox fx:id="areaComboBox" promptText="Select area (optional)..." 
+                  <ComboBox fx:id="areaComboBox" promptText="Select area..." 
                             style="-fx-font-size: 14px;" />
                </VBox>
                
@@ -60,7 +68,13 @@
             
             <!-- Screenshots Section -->
             <VBox spacing="10">
-               <Label text="Screenshots:" style="-fx-font-size: 14px; -fx-font-weight: bold;" />
+               <HBox spacing="10" alignment="CENTER_LEFT">
+                  <Label text="Screenshots:" style="-fx-font-size: 14px; -fx-font-weight: bold;" />
+                  <Button fx:id="captureButton" 
+                          text="Capture Screenshot" 
+                          onAction="#captureScreenshot"
+                          style="-fx-font-size: 14px; -fx-padding: 8 16; -fx-background-color: #0078d4; -fx-text-fill: white;" />
+               </HBox>
                
                <!-- Screenshots Container -->
                <BorderPane style="-fx-background-color: white; -fx-border-color: #cccccc; -fx-border-width: 1;">
@@ -74,13 +88,6 @@
                      </ScrollPane>
                   </center>
                </BorderPane>
-               
-               <HBox spacing="10">
-                  <Button fx:id="captureButton" 
-                          text="Capture Screenshot" 
-                          onAction="#captureScreenshot"
-                          style="-fx-font-size: 14px; -fx-padding: 8 16; -fx-background-color: #0078d4; -fx-text-fill: white;" />
-               </HBox>
             </VBox>
             
          </VBox>

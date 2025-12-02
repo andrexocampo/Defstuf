@@ -604,9 +604,17 @@ public class CreateNoteController {
             }
         }
         
-        // Get selected area
+        // Get selected area (REQUIRED)
         Area selectedArea = areaComboBox.getSelectionModel().getSelectedItem();
-        Long areaId = selectedArea != null ? selectedArea.getId() : null;
+        
+        // Validate area (REQUIRED)
+        if (selectedArea == null) {
+            showError("Please select an area for the note");
+            areaComboBox.requestFocus();
+            return;
+        }
+        
+        Long areaId = selectedArea.getId();
         
         // Get selected note type (or use "Definition" as default)
         NoteType selectedNoteType = noteTypeComboBox.getSelectionModel().getSelectedItem();

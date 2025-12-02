@@ -40,7 +40,7 @@ public class NoteService {
      * @param title The note title (REQUIRED, cannot be empty)
      * @param sourceId The note source ID (optional, defaults to "personal" source if null)
      * @param description The note description (optional, can be empty)
-     * @param areaId The area ID (optional)
+     * @param areaId The area ID (REQUIRED)
      * @param noteTypeId The note type ID (optional)
      * @param imagePaths List of image file paths (optional)
      * @param fileSizes List of image file sizes (optional)
@@ -54,6 +54,11 @@ public class NoteService {
         // Validate title (REQUIRED)
         if (title == null || title.trim().isEmpty()) {
             throw new NoteException("Note title cannot be empty");
+        }
+        
+        // Validate area (REQUIRED)
+        if (areaId == null) {
+            throw new NoteException("Area is required for the note");
         }
         
         // Set default source if null
