@@ -123,18 +123,42 @@ CREATE TABLE IF NOT EXISTS images (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================
--- 9. STUDY_SESSIONS TABLE (With user_id)
+-- 9. STUDY_SESSIONS TABLE (For study sessions management)
 -- ============================================
 CREATE TABLE IF NOT EXISTS study_sessions (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT NOT NULL,  -- Session belongs to a user
-    session_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    session_duration INT,
+    session_name VARCHAR(255) NOT NULL,
+    area_id BIGINT,  -- Area for this session (NULL if multi-area)
+    
+    -- Session status and timing
+    status ENUM('active', 'completed', 'paused', 'cancelled') DEFAULT 'active',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    started_at TIMESTAMP NULL,  -- When the session actually started
+    completed_at TIMESTAMP NULL,  -- When the session was completed
+    
+    -- Basic session configurations
+    session_duration_min INT DEFAULT 25,  -- Duration in minutes
+    cards_limit INT DEFAULT 20,  -- Maximum cards per session
+    review_order ENUM('random', 'oldest_first', 'hardest_first') DEFAULT 'random',
+    show_hints BOOLEAN DEFAULT FALSE,
+    auto_advance_sec INT DEFAULT 0,  -- 0 = manual, >0 = auto-advance in seconds
+    
+    -- Advanced session configurations
+    enable_breaks BOOLEAN DEFAULT FALSE,
+    break_interval_min INT DEFAULT 25,  -- Break every N minutes
+    break_duration_min INT DEFAULT 5,  -- Break duration in minutes
+    
+    -- Flexible configuration for future features
+    custom_config JSON,  -- For any extra configuration in the future
     
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    INDEX idx_user (user_id),  -- To filter study sessions by user
-    INDEX idx_session_date (session_date)  -- Useful for filtering by date
+    FOREIGN KEY (area_id) REFERENCES areas(id) ON DELETE SET NULL,
+    INDEX idx_user (user_id),  -- To filter sessions by user
+    INDEX idx_area (area_id),  -- To filter sessions by area
+    INDEX idx_status (status),  -- To filter by status
+    INDEX idx_created_at (created_at),  -- Useful for sorting by creation date
+    INDEX idx_user_status (user_id, status)  -- For finding user's active/completed sessions
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================
@@ -181,5 +205,31 @@ CREATE TABLE IF NOT EXISTS shared_notes (
     UNIQUE KEY uk_note_shared_user (note_id, shared_with_user_id),  -- Prevents duplicates
     INDEX idx_note (note_id),
     INDEX idx_shared_user (shared_with_user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================
+-- 13. SCHEDULED REVIEWS TABLE (For spaced repetition review system)
+-- ============================================
+CREATE TABLE IF NOT EXISTS scheduled_reviews (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    note_id BIGINT NOT NULL,
+    user_id BIGINT NOT NULL,  -- Owner of the scheduled review
+    scheduled_date DATE NOT NULL,  -- Date scheduled for review
+    reviewed_date DATETIME NULL,  -- Actual date when reviewed (NULL if pending)
+    ease_factor DECIMAL(4,2) DEFAULT 2.5,  -- Ease factor for spaced repetition (e.g., 1.8, 2.5)
+    current_interval INT DEFAULT 1,  -- Current interval in days
+    next_interval INT NULL,  -- Next calculated interval in days
+    review_status ENUM('pending', 'reviewed', 'cancelled') DEFAULT 'pending',
+    review_quality TINYINT NULL,  -- 1=Forgot, 2=Hard, 3=Good, 4=Easy
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (note_id) REFERENCES notes(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_note (note_id),  -- To find all reviews for a note
+    INDEX idx_user (user_id),  -- To filter reviews by user
+    INDEX idx_scheduled_date (scheduled_date),  -- Useful for finding reviews by date
+    INDEX idx_review_status (review_status),  -- To filter by status
+    INDEX idx_user_scheduled (user_id, scheduled_date, review_status)  -- For daily review queries
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

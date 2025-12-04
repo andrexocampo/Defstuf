@@ -165,18 +165,34 @@ public class DatabaseInitializer {
     }
     
     /**
-     * Creates the study_sessions table with user_id
+     * Creates the study_sessions table for study sessions management
      */
     public static void createStudySessionsTable() throws Exception {
         String sql = "CREATE TABLE IF NOT EXISTS study_sessions (" +
                      "id BIGINT AUTO_INCREMENT PRIMARY KEY, " +
                      "user_id BIGINT NOT NULL, " +
-                     "session_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
-                     "session_duration INT, " +
+                     "session_name VARCHAR(255) NOT NULL, " +
+                     "area_id BIGINT, " +
+                     "status ENUM('active', 'completed', 'paused', 'cancelled') DEFAULT 'active', " +
                      "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
+                     "started_at TIMESTAMP NULL, " +
+                     "completed_at TIMESTAMP NULL, " +
+                     "session_duration_min INT DEFAULT 25, " +
+                     "cards_limit INT DEFAULT 20, " +
+                     "review_order ENUM('random', 'oldest_first', 'hardest_first') DEFAULT 'random', " +
+                     "show_hints BOOLEAN DEFAULT FALSE, " +
+                     "auto_advance_sec INT DEFAULT 0, " +
+                     "enable_breaks BOOLEAN DEFAULT FALSE, " +
+                     "break_interval_min INT DEFAULT 25, " +
+                     "break_duration_min INT DEFAULT 5, " +
+                     "custom_config JSON, " +
                      "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE, " +
+                     "FOREIGN KEY (area_id) REFERENCES areas(id) ON DELETE SET NULL, " +
                      "INDEX idx_user (user_id), " +
-                     "INDEX idx_session_date (session_date)" +
+                     "INDEX idx_area (area_id), " +
+                     "INDEX idx_status (status), " +
+                     "INDEX idx_created_at (created_at), " +
+                     "INDEX idx_user_status (user_id, status)" +
                      ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
         
         executeSQL(sql, "Study sessions table");
@@ -234,6 +250,35 @@ public class DatabaseInitializer {
                      ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
         
         executeSQL(sql, "Shared notes table");
+    }
+    
+    /**
+     * Creates the scheduled_reviews table for spaced repetition review system
+     */
+    public static void createScheduledReviewsTable() throws Exception {
+        String sql = "CREATE TABLE IF NOT EXISTS scheduled_reviews (" +
+                     "id BIGINT AUTO_INCREMENT PRIMARY KEY, " +
+                     "note_id BIGINT NOT NULL, " +
+                     "user_id BIGINT NOT NULL, " +
+                     "scheduled_date DATE NOT NULL, " +
+                     "reviewed_date DATETIME NULL, " +
+                     "ease_factor DECIMAL(4,2) DEFAULT 2.5, " +
+                     "current_interval INT DEFAULT 1, " +
+                     "next_interval INT NULL, " +
+                     "review_status ENUM('pending', 'reviewed', 'cancelled') DEFAULT 'pending', " +
+                     "review_quality TINYINT NULL, " +
+                     "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
+                     "updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, " +
+                     "FOREIGN KEY (note_id) REFERENCES notes(id) ON DELETE CASCADE, " +
+                     "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE, " +
+                     "INDEX idx_note (note_id), " +
+                     "INDEX idx_user (user_id), " +
+                     "INDEX idx_scheduled_date (scheduled_date), " +
+                     "INDEX idx_review_status (review_status), " +
+                     "INDEX idx_user_scheduled (user_id, scheduled_date, review_status)" +
+                     ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
+        
+        executeSQL(sql, "Scheduled reviews table");
     }
     
     /**
@@ -316,6 +361,7 @@ public class DatabaseInitializer {
             createImagesTable();
             createQuestionsTable();
             createSharedNotesTable();
+            createScheduledReviewsTable();
             
             // Step 4: Initialize default data
             initializeDefaultData();
