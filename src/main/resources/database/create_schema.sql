@@ -123,9 +123,9 @@ CREATE TABLE IF NOT EXISTS images (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================
--- 9. SESSIONS TABLE (With user_id)
+-- 9. STUDY_SESSIONS TABLE (With user_id)
 -- ============================================
-CREATE TABLE IF NOT EXISTS sessions (
+CREATE TABLE IF NOT EXISTS study_sessions (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT NOT NULL,  -- Session belongs to a user
     session_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -133,7 +133,7 @@ CREATE TABLE IF NOT EXISTS sessions (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    INDEX idx_user (user_id),  -- To filter sessions by user
+    INDEX idx_user (user_id),  -- To filter study sessions by user
     INDEX idx_session_date (session_date)  -- Useful for filtering by date
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -142,9 +142,9 @@ CREATE TABLE IF NOT EXISTS sessions (
 -- ============================================
 CREATE TABLE IF NOT EXISTS answers (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
+    content VARCHAR(255) NOT NULL,
     
-    INDEX idx_name (name)  -- Necessary if you search by name (not UNIQUE)
+    INDEX idx_content (content)  -- Necessary if you search by content (not UNIQUE)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================
@@ -158,7 +158,7 @@ CREATE TABLE IF NOT EXISTS questions (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     
     
-    FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE,
+    FOREIGN KEY (session_id) REFERENCES study_sessions(id) ON DELETE CASCADE,
     FOREIGN KEY (answer_id) REFERENCES answers(id) ON DELETE CASCADE,
     FOREIGN KEY (note_id) REFERENCES notes(id) ON DELETE CASCADE,
     INDEX idx_session (session_id),

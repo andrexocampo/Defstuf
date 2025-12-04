@@ -165,10 +165,10 @@ public class DatabaseInitializer {
     }
     
     /**
-     * Creates the sessions table with user_id
+     * Creates the study_sessions table with user_id
      */
-    public static void createSessionsTable() throws Exception {
-        String sql = "CREATE TABLE IF NOT EXISTS sessions (" +
+    public static void createStudySessionsTable() throws Exception {
+        String sql = "CREATE TABLE IF NOT EXISTS study_sessions (" +
                      "id BIGINT AUTO_INCREMENT PRIMARY KEY, " +
                      "user_id BIGINT NOT NULL, " +
                      "session_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
@@ -179,7 +179,7 @@ public class DatabaseInitializer {
                      "INDEX idx_session_date (session_date)" +
                      ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
         
-        executeSQL(sql, "Sessions table");
+        executeSQL(sql, "Study sessions table");
     }
     
     /**
@@ -188,8 +188,8 @@ public class DatabaseInitializer {
     public static void createAnswersTable() throws Exception {
         String sql = "CREATE TABLE IF NOT EXISTS answers (" +
                      "id BIGINT AUTO_INCREMENT PRIMARY KEY, " +
-                     "name VARCHAR(255) NOT NULL, " +
-                     "INDEX idx_name (name)" +
+                     "content VARCHAR(255) NOT NULL, " +
+                     "INDEX idx_content (content)" +
                      ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
         
         executeSQL(sql, "Answers table");
@@ -205,7 +205,7 @@ public class DatabaseInitializer {
                      "answer_id BIGINT NOT NULL, " +
                      "note_id BIGINT NOT NULL, " +
                      "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
-                     "FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE, " +
+                     "FOREIGN KEY (session_id) REFERENCES study_sessions(id) ON DELETE CASCADE, " +
                      "FOREIGN KEY (answer_id) REFERENCES answers(id) ON DELETE CASCADE, " +
                      "FOREIGN KEY (note_id) REFERENCES notes(id) ON DELETE CASCADE, " +
                      "INDEX idx_session (session_id), " +
@@ -310,7 +310,7 @@ public class DatabaseInitializer {
             // Step 2: Create tables that depend on reference tables
             createUserStatisticsTable();
             createNotesTable();
-            createSessionsTable();
+            createStudySessionsTable();
             
             // Step 3: Create tables that depend on previous tables
             createImagesTable();
