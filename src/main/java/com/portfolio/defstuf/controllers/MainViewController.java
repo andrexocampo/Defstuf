@@ -28,6 +28,9 @@ public class MainViewController {
     private Button createNoteButton;
     
     @FXML
+    private Button startReviewButton;
+    
+    @FXML
     private Button manageAreasButton;
     
     @FXML
@@ -93,6 +96,35 @@ public class MainViewController {
         } catch (Exception e) {
             e.printStackTrace();
             showError("Error opening Create Note view: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Opens the Study Session Configuration view
+     * RF-05.1: Navigation from main view to Study Session Configuration
+     */
+    @FXML
+    private void openStudySessionConfigView() {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/com/portfolio/defstuf/views/study/ConfigStudySessionView.fxml")
+            );
+            Parent root = loader.load();
+            
+            com.portfolio.defstuf.controllers.study.ConfigStudySessionController controller = loader.getController();
+            controller.setPrimaryStage(primaryStage);
+            
+            Scene scene = new Scene(root, 800, 700);
+            scene.getStylesheets().add(
+                getClass().getResource("/com/portfolio/defstuf/styles/main.css").toExternalForm()
+            );
+            
+            primaryStage.setTitle("DefStuf - Configure Study Session");
+            primaryStage.setScene(scene);
+            primaryStage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+            showError("Error opening Study Session Configuration view: " + e.getMessage());
         }
     }
     

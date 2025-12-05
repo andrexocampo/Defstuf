@@ -113,6 +113,32 @@ public class NoteRepository {
     }
     
     /**
+     * Counts notes by area ID and user ID
+     * 
+     * @param areaId The area ID
+     * @param userId The user ID
+     * @return Number of notes for the specified area and user
+     * @throws SQLException If database error occurs
+     */
+    public int countByAreaIdAndUserId(Long areaId, Long userId) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM notes WHERE area_id = ? AND user_id = ?";
+        
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setLong(1, areaId);
+            stmt.setLong(2, userId);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        }
+        return 0;
+    }
+    
+    /**
      * Maps a ResultSet row to a Note object
      */
     private Note mapResultSetToNote(ResultSet rs) throws SQLException {

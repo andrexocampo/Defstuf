@@ -34,6 +34,8 @@
             <Label fx:id="infoLabel" text="System Information" />
             <Button fx:id="createNoteButton" text="Create Note" onAction="#openCreateNoteView" 
                     style="-fx-background-color: #0078d4; -fx-text-fill: white; -fx-padding: 10 20; -fx-font-size: 14px;" />
+            <Button fx:id="startReviewButton" text="Start Review" onAction="#openStudySessionConfigView" 
+                    style="-fx-background-color: #ff9800; -fx-text-fill: white; -fx-padding: 10 20; -fx-font-size: 14px;" />
             <Button fx:id="manageAreasButton" text="Manage Areas" onAction="#openManageAreasView" 
                     style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-padding: 10 20; -fx-font-size: 14px;" />
    </children>
