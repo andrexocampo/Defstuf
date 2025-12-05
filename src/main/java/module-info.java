@@ -18,12 +18,14 @@ module com.portfolio.defstuf {
     exports com.portfolio.defstuf.models.user;
     exports com.portfolio.defstuf.models.area;
     exports com.portfolio.defstuf.models.note;
+    exports com.portfolio.defstuf.models.study;
     exports com.portfolio.defstuf.util;
     exports com.portfolio.defstuf.util.security;
     exports com.portfolio.defstuf.repository;
     exports com.portfolio.defstuf.repository.user;
     exports com.portfolio.defstuf.repository.area;
     exports com.portfolio.defstuf.repository.note;
+    exports com.portfolio.defstuf.repository.study;
     exports com.portfolio.defstuf.services.area;
     exports com.portfolio.defstuf.services.note;
     exports com.portfolio.defstuf.session;
