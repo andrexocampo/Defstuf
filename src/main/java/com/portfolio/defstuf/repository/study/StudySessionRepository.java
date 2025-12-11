@@ -19,9 +19,10 @@ public class StudySessionRepository {
     public StudySession save(StudySession session) throws SQLException {
         String sql = "INSERT INTO study_sessions (" +
                      "user_id, session_name, area_id, status, created_at, started_at, completed_at, " +
-                     "session_duration_min, cards_limit, review_order, show_hints, auto_advance_sec, " +
-                     "enable_breaks, break_interval_min, break_duration_min, custom_config" +
-                     ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                     "actual_study_time_sec, session_duration_min, cards_limit, review_order, show_hints, " +
+                     "auto_advance_sec, enable_breaks, break_interval_min, break_duration_min, " +
+                     "max_breaks_allowed, breaks_taken, notes_studied_count, custom_config" +
+                     ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -53,20 +54,30 @@ public class StudySessionRepository {
                 stmt.setNull(7, Types.TIMESTAMP);
             }
             
-            stmt.setInt(8, session.getSessionDurationMin() != null ? session.getSessionDurationMin() : 25);
-            stmt.setInt(9, session.getCardsLimit() != null ? session.getCardsLimit() : 20);
-            stmt.setString(10, session.getReviewOrder() != null ? 
+            stmt.setInt(8, session.getActualStudyTimeSec() != null ? session.getActualStudyTimeSec() : 0);
+            stmt.setInt(9, session.getSessionDurationMin() != null ? session.getSessionDurationMin() : 25);
+            stmt.setInt(10, session.getCardsLimit() != null ? session.getCardsLimit() : 20);
+            stmt.setString(11, session.getReviewOrder() != null ? 
                     session.getReviewOrder().getValue() : "random");
-            stmt.setBoolean(11, session.getShowHints() != null ? session.getShowHints() : false);
-            stmt.setInt(12, session.getAutoAdvanceSec() != null ? session.getAutoAdvanceSec() : 0);
-            stmt.setBoolean(13, session.getEnableBreaks() != null ? session.getEnableBreaks() : false);
-            stmt.setInt(14, session.getBreakIntervalMin() != null ? session.getBreakIntervalMin() : 25);
-            stmt.setInt(15, session.getBreakDurationMin() != null ? session.getBreakDurationMin() : 5);
+            stmt.setBoolean(12, session.getShowHints() != null ? session.getShowHints() : false);
+            stmt.setInt(13, session.getAutoAdvanceSec() != null ? session.getAutoAdvanceSec() : 0);
+            stmt.setBoolean(14, session.getEnableBreaks() != null ? session.getEnableBreaks() : false);
+            stmt.setInt(15, session.getBreakIntervalMin() != null ? session.getBreakIntervalMin() : 25);
+            stmt.setInt(16, session.getBreakDurationMin() != null ? session.getBreakDurationMin() : 5);
+            
+            if (session.getMaxBreaksAllowed() != null) {
+                stmt.setInt(17, session.getMaxBreaksAllowed());
+            } else {
+                stmt.setNull(17, Types.INTEGER);
+            }
+            
+            stmt.setInt(18, session.getBreaksTaken() != null ? session.getBreaksTaken() : 0);
+            stmt.setInt(19, session.getNotesStudiedCount() != null ? session.getNotesStudiedCount() : 0);
             
             if (session.getCustomConfig() != null && !session.getCustomConfig().trim().isEmpty()) {
-                stmt.setString(16, session.getCustomConfig());
+                stmt.setString(20, session.getCustomConfig());
             } else {
-                stmt.setNull(16, Types.VARCHAR);
+                stmt.setNull(20, Types.VARCHAR);
             }
             
             int affectedRows = stmt.executeUpdate();
@@ -158,9 +169,10 @@ public class StudySessionRepository {
     public boolean update(StudySession session) throws SQLException {
         String sql = "UPDATE study_sessions SET " +
                      "session_name = ?, area_id = ?, status = ?, started_at = ?, completed_at = ?, " +
-                     "session_duration_min = ?, cards_limit = ?, review_order = ?, show_hints = ?, " +
-                     "auto_advance_sec = ?, enable_breaks = ?, break_interval_min = ?, " +
-                     "break_duration_min = ?, custom_config = ? " +
+                     "actual_study_time_sec = ?, session_duration_min = ?, cards_limit = ?, review_order = ?, " +
+                     "show_hints = ?, auto_advance_sec = ?, enable_breaks = ?, break_interval_min = ?, " +
+                     "break_duration_min = ?, max_breaks_allowed = ?, breaks_taken = ?, " +
+                     "notes_studied_count = ?, custom_config = ? " +
                      "WHERE id = ?";
         
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
@@ -188,23 +200,33 @@ public class StudySessionRepository {
                 stmt.setNull(5, Types.TIMESTAMP);
             }
             
-            stmt.setInt(6, session.getSessionDurationMin() != null ? session.getSessionDurationMin() : 25);
-            stmt.setInt(7, session.getCardsLimit() != null ? session.getCardsLimit() : 20);
-            stmt.setString(8, session.getReviewOrder() != null ? 
+            stmt.setInt(6, session.getActualStudyTimeSec() != null ? session.getActualStudyTimeSec() : 0);
+            stmt.setInt(7, session.getSessionDurationMin() != null ? session.getSessionDurationMin() : 25);
+            stmt.setInt(8, session.getCardsLimit() != null ? session.getCardsLimit() : 20);
+            stmt.setString(9, session.getReviewOrder() != null ? 
                     session.getReviewOrder().getValue() : "random");
-            stmt.setBoolean(9, session.getShowHints() != null ? session.getShowHints() : false);
-            stmt.setInt(10, session.getAutoAdvanceSec() != null ? session.getAutoAdvanceSec() : 0);
-            stmt.setBoolean(11, session.getEnableBreaks() != null ? session.getEnableBreaks() : false);
-            stmt.setInt(12, session.getBreakIntervalMin() != null ? session.getBreakIntervalMin() : 25);
-            stmt.setInt(13, session.getBreakDurationMin() != null ? session.getBreakDurationMin() : 5);
+            stmt.setBoolean(10, session.getShowHints() != null ? session.getShowHints() : false);
+            stmt.setInt(11, session.getAutoAdvanceSec() != null ? session.getAutoAdvanceSec() : 0);
+            stmt.setBoolean(12, session.getEnableBreaks() != null ? session.getEnableBreaks() : false);
+            stmt.setInt(13, session.getBreakIntervalMin() != null ? session.getBreakIntervalMin() : 25);
+            stmt.setInt(14, session.getBreakDurationMin() != null ? session.getBreakDurationMin() : 5);
             
-            if (session.getCustomConfig() != null && !session.getCustomConfig().trim().isEmpty()) {
-                stmt.setString(14, session.getCustomConfig());
+            if (session.getMaxBreaksAllowed() != null) {
+                stmt.setInt(15, session.getMaxBreaksAllowed());
             } else {
-                stmt.setNull(14, Types.VARCHAR);
+                stmt.setNull(15, Types.INTEGER);
             }
             
-            stmt.setLong(15, session.getId());
+            stmt.setInt(16, session.getBreaksTaken() != null ? session.getBreaksTaken() : 0);
+            stmt.setInt(17, session.getNotesStudiedCount() != null ? session.getNotesStudiedCount() : 0);
+            
+            if (session.getCustomConfig() != null && !session.getCustomConfig().trim().isEmpty()) {
+                stmt.setString(18, session.getCustomConfig());
+            } else {
+                stmt.setNull(18, Types.VARCHAR);
+            }
+            
+            stmt.setLong(19, session.getId());
             
             int affectedRows = stmt.executeUpdate();
             return affectedRows > 0;
@@ -258,6 +280,7 @@ public class StudySessionRepository {
             session.setCompletedAt(completedAt.toLocalDateTime());
         }
         
+        session.setActualStudyTimeSec(rs.getInt("actual_study_time_sec"));
         session.setSessionDurationMin(rs.getInt("session_duration_min"));
         session.setCardsLimit(rs.getInt("cards_limit"));
         session.setReviewOrder(StudySession.ReviewOrder.fromString(rs.getString("review_order")));
@@ -267,6 +290,16 @@ public class StudySessionRepository {
         session.setBreakIntervalMin(rs.getInt("break_interval_min"));
         session.setBreakDurationMin(rs.getInt("break_duration_min"));
         
+        int maxBreaksAllowed = rs.getInt("max_breaks_allowed");
+        if (rs.wasNull()) {
+            session.setMaxBreaksAllowed(null);
+        } else {
+            session.setMaxBreaksAllowed(maxBreaksAllowed);
+        }
+        
+        session.setBreaksTaken(rs.getInt("breaks_taken"));
+        session.setNotesStudiedCount(rs.getInt("notes_studied_count"));
+        
         String customConfig = rs.getString("custom_config");
         if (customConfig != null) {
             session.setCustomConfig(customConfig);
@@ -275,4 +308,6 @@ public class StudySessionRepository {
         return session;
     }
 }
+
+
 

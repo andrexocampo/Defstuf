@@ -10,7 +10,6 @@ public class StudySession {
     public enum Status {
         ACTIVE("active"),
         COMPLETED("completed"),
-        PAUSED("paused"),
         CANCELLED("cancelled");
         
         private final String value;
@@ -68,6 +67,7 @@ public class StudySession {
     private LocalDateTime createdAt;
     private LocalDateTime startedAt;
     private LocalDateTime completedAt;
+    private Integer actualStudyTimeSec;  // Tiempo real de estudio en segundos (sin descansos)
     
     // Session configurations
     private Integer sessionDurationMin;
@@ -78,6 +78,9 @@ public class StudySession {
     private Boolean enableBreaks;
     private Integer breakIntervalMin;
     private Integer breakDurationMin;
+    private Integer maxBreaksAllowed;  // NULL = sin límite, 0 = sin descansos, >0 = máximo permitido
+    private Integer breaksTaken;  // Número de descansos tomados
+    private Integer notesStudiedCount;  // Número de notas estudiadas en esta sesión
     private String customConfig;  // JSON as String
     
     public StudySession() {
@@ -98,6 +101,10 @@ public class StudySession {
         this.enableBreaks = false;
         this.breakIntervalMin = 25;
         this.breakDurationMin = 5;
+        this.maxBreaksAllowed = null;  // Sin límite por defecto
+        this.breaksTaken = 0;
+        this.actualStudyTimeSec = 0;
+        this.notesStudiedCount = 0;
     }
     
     // Getters and Setters
@@ -165,6 +172,14 @@ public class StudySession {
         this.completedAt = completedAt;
     }
     
+    public Integer getActualStudyTimeSec() {
+        return actualStudyTimeSec;
+    }
+    
+    public void setActualStudyTimeSec(Integer actualStudyTimeSec) {
+        this.actualStudyTimeSec = actualStudyTimeSec;
+    }
+    
     public Integer getSessionDurationMin() {
         return sessionDurationMin;
     }
@@ -229,6 +244,30 @@ public class StudySession {
         this.breakDurationMin = breakDurationMin;
     }
     
+    public Integer getMaxBreaksAllowed() {
+        return maxBreaksAllowed;
+    }
+    
+    public void setMaxBreaksAllowed(Integer maxBreaksAllowed) {
+        this.maxBreaksAllowed = maxBreaksAllowed;
+    }
+    
+    public Integer getBreaksTaken() {
+        return breaksTaken;
+    }
+    
+    public void setBreaksTaken(Integer breaksTaken) {
+        this.breaksTaken = breaksTaken;
+    }
+    
+    public Integer getNotesStudiedCount() {
+        return notesStudiedCount;
+    }
+    
+    public void setNotesStudiedCount(Integer notesStudiedCount) {
+        this.notesStudiedCount = notesStudiedCount;
+    }
+    
     public String getCustomConfig() {
         return customConfig;
     }
@@ -261,4 +300,6 @@ public class StudySession {
         return id != null ? id.hashCode() : 0;
     }
 }
+
+
 

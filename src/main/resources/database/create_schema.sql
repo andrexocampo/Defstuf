@@ -132,14 +132,15 @@ CREATE TABLE IF NOT EXISTS study_sessions (
     area_id BIGINT,  -- Area for this session (NULL if multi-area)
     
     -- Session status and timing
-    status ENUM('active', 'completed', 'paused', 'cancelled') DEFAULT 'active',
+    status ENUM('active', 'completed', 'cancelled') DEFAULT 'active',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     started_at TIMESTAMP NULL,  -- When the session actually started
     completed_at TIMESTAMP NULL,  -- When the session was completed
+    actual_study_time_sec INT DEFAULT 0 COMMENT 'Tiempo real de estudio en segundos (sin incluir descansos)',
     
     -- Basic session configurations
-    session_duration_min INT DEFAULT 25,  -- Duration in minutes
-    cards_limit INT DEFAULT 20,  -- Maximum cards per session
+    session_duration_min INT DEFAULT 25,  -- Duration in minutes (planned/suggested)
+    cards_limit INT DEFAULT 20,  -- Maximum cards per session (límite máximo, puede estudiarse menos)
     review_order ENUM('random', 'oldest_first', 'hardest_first') DEFAULT 'random',
     show_hints BOOLEAN DEFAULT FALSE,
     auto_advance_sec INT DEFAULT 0,  -- 0 = manual, >0 = auto-advance in seconds
@@ -148,6 +149,11 @@ CREATE TABLE IF NOT EXISTS study_sessions (
     enable_breaks BOOLEAN DEFAULT FALSE,
     break_interval_min INT DEFAULT 25,  -- Break every N minutes
     break_duration_min INT DEFAULT 5,  -- Break duration in minutes
+    max_breaks_allowed INT DEFAULT NULL COMMENT 'Número máximo de descansos permitidos (NULL = sin límite, 0 = sin descansos)',
+    breaks_taken INT DEFAULT 0 COMMENT 'Número de descansos tomados en esta sesión',
+    
+    -- Session tracking
+    notes_studied_count INT DEFAULT 0 COMMENT 'Número de notas estudiadas en esta sesión',
     
     -- Flexible configuration for future features
     custom_config JSON,  -- For any extra configuration in the future

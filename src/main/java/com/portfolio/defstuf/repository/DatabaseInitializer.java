@@ -173,10 +173,11 @@ public class DatabaseInitializer {
                      "user_id BIGINT NOT NULL, " +
                      "session_name VARCHAR(255) NOT NULL, " +
                      "area_id BIGINT, " +
-                     "status ENUM('active', 'completed', 'paused', 'cancelled') DEFAULT 'active', " +
+                     "status ENUM('active', 'completed', 'cancelled') DEFAULT 'active', " +
                      "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
                      "started_at TIMESTAMP NULL, " +
                      "completed_at TIMESTAMP NULL, " +
+                     "actual_study_time_sec INT DEFAULT 0 COMMENT 'Tiempo real de estudio en segundos (sin incluir descansos)', " +
                      "session_duration_min INT DEFAULT 25, " +
                      "cards_limit INT DEFAULT 20, " +
                      "review_order ENUM('random', 'oldest_first', 'hardest_first') DEFAULT 'random', " +
@@ -185,6 +186,9 @@ public class DatabaseInitializer {
                      "enable_breaks BOOLEAN DEFAULT FALSE, " +
                      "break_interval_min INT DEFAULT 25, " +
                      "break_duration_min INT DEFAULT 5, " +
+                     "max_breaks_allowed INT DEFAULT NULL COMMENT 'Número máximo de descansos permitidos (NULL = sin límite, 0 = sin descansos)', " +
+                     "breaks_taken INT DEFAULT 0 COMMENT 'Número de descansos tomados en esta sesión', " +
+                     "notes_studied_count INT DEFAULT 0 COMMENT 'Número de notas estudiadas en esta sesión', " +
                      "custom_config JSON, " +
                      "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE, " +
                      "FOREIGN KEY (area_id) REFERENCES areas(id) ON DELETE SET NULL, " +
