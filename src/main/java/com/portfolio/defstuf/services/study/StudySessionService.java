@@ -98,6 +98,28 @@ public class StudySessionService {
     }
     
     /**
+     * Updates a study session
+     * 
+     * @param session The session to update
+     * @throws StudySessionException If update fails
+     */
+    public void updateSession(StudySession session) throws StudySessionException {
+        if (session == null || session.getId() == null) {
+            throw new StudySessionException("Session cannot be null and must have an ID");
+        }
+        
+        try {
+            boolean updated = repository.update(session);
+            
+            if (!updated) {
+                throw new StudySessionException("Failed to update study session");
+            }
+        } catch (SQLException e) {
+            throw new StudySessionException("Error updating study session: " + e.getMessage(), e);
+        }
+    }
+    
+    /**
      * Updates a study session status
      * 
      * @param sessionId The session ID
@@ -135,4 +157,6 @@ public class StudySessionService {
         }
     }
 }
+
+
 

@@ -492,6 +492,9 @@ public class ConfigStudySessionController {
                                + java.time.LocalDateTime.now().format(
                                    java.time.format.DateTimeFormatter.ofPattern("MMM dd, HH:mm"));
             
+            // Get selected source IDs
+            List<Long> selectedSourceIds = getSelectedSourceIds();
+            
             // Create study session
             StudySession session = studySessionService.createStudySession(
                 sessionName,
@@ -501,24 +504,34 @@ public class ConfigStudySessionController {
                 reviewOrder
             );
             
-            // Show success message
-            statusLabel.setText("Study session created successfully! Session ID: " + session.getId());
-            statusLabel.setStyle("-fx-text-fill: #28a745;");
-            
-            // TODO: Navigate to study session view (placeholder for future implementation)
-            // For now, just show a message
-            Alert infoAlert = new Alert(Alert.AlertType.INFORMATION);
-            infoAlert.setTitle("Study Session Created");
-            infoAlert.setHeaderText("Study session created successfully!");
-            infoAlert.setContentText("Session ID: " + session.getId() + "\n\n" +
-                                   "The study session view will be implemented in the next iteration.");
-            infoAlert.showAndWait();
-            
-            // Navigate back to main view for now
-            handleBack();
+            // Navigate to study session view
+            navigateToStudySessionView(session, selectedArea.getId(), selectedSourceIds);
             
         } catch (StudySessionService.StudySessionException e) {
             showError("Error creating study session: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Navigates to the study session view
+     */
+    private void navigateToStudySessionView(StudySession session, Long areaId, List<Long> sourceIds) {
+        try {
+            Stage stage = (Stage) startSessionButton.getScene().getWindow();
+            FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/com/portfolio/defstuf/views/study/StudySessionView.fxml")
+            );
+            Parent root = loader.load();
+            
+            StudySessionController controller = loader.getController();
+            controller.setStudySession(session, areaId, sourceIds);
+            
+            Scene scene = new Scene(root);
+            stage.setScene(scene);
+            stage.centerOnScreen();
+        } catch (Exception e) {
+            e.printStackTrace();
+            showError("Error loading study session view: " + e.getMessage());
         }
     }
     

@@ -236,6 +236,51 @@ public class NoteRepository {
     }
     
     /**
+     * Finds notes by area ID, user ID, and optionally by source IDs
+     * If sourceIds is null or empty, returns all notes for the area and user
+     * 
+     * @param areaId The area ID
+     * @param userId The user ID
+     * @param sourceIds List of source IDs to filter by (null or empty means all sources)
+     * @return List of notes matching the criteria
+     * @throws SQLException If database error occurs
+     */
+    public List<Note> findByAreaIdAndUserIdAndSourceIds(Long areaId, Long userId, List<Long> sourceIds) throws SQLException {
+        String sql;
+        if (sourceIds == null || sourceIds.isEmpty()) {
+            sql = "SELECT id, user_id, title, source_id, description, area_id, note_type_id, created_at, updated_at " +
+                  "FROM notes WHERE area_id = ? AND user_id = ? ORDER BY title, created_at";
+        } else {
+            String placeholders = String.join(",", java.util.Collections.nCopies(sourceIds.size(), "?"));
+            sql = "SELECT id, user_id, title, source_id, description, area_id, note_type_id, created_at, updated_at " +
+                  "FROM notes WHERE area_id = ? AND user_id = ? AND source_id IN (" + placeholders + ") " +
+                  "ORDER BY title, created_at";
+        }
+        
+        List<Note> notes = new ArrayList<>();
+        
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setLong(1, areaId);
+            stmt.setLong(2, userId);
+            
+            if (sourceIds != null && !sourceIds.isEmpty()) {
+                for (int i = 0; i < sourceIds.size(); i++) {
+                    stmt.setLong(3 + i, sourceIds.get(i));
+                }
+            }
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    notes.add(mapResultSetToNote(rs));
+                }
+            }
+        }
+        return notes;
+    }
+    
+    /**
      * Maps a ResultSet row to a Note object
      */
     private Note mapResultSetToNote(ResultSet rs) throws SQLException {
