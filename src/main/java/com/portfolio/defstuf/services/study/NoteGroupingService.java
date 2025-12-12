@@ -40,6 +40,8 @@ public class NoteGroupingService {
      * @param sourceIds List of source IDs (null or empty means all sources)
      * @param cardsLimit Maximum number of note groups (null means no limit)
      * @param reviewOrder The order to sort notes
+     * @param area The area object
+     * @param onlyNewAndPending If true, only load new and pending notes; if false, load all notes
      * @return List of NoteGroup objects
      * @throws SQLException If database error occurs
      */
@@ -48,15 +50,25 @@ public class NoteGroupingService {
             List<Long> sourceIds,
             Integer cardsLimit,
             StudySession.ReviewOrder reviewOrder,
-            Area area
+            Area area,
+            boolean onlyNewAndPending
     ) throws SQLException {
         
         if (areaId == null || userId == null) {
             return new ArrayList<>();
         }
         
-        // Get eligible notes
-        List<Note> eligibleNotes = noteRepository.findByAreaIdAndUserIdAndSourceIds(areaId, userId, sourceIds);
+        // Get eligible notes based on flag
+        List<Note> eligibleNotes;
+        if (onlyNewAndPending) {
+            // Load only new and pending notes
+            java.time.LocalDate today = java.time.LocalDate.now();
+            eligibleNotes = noteRepository.findNewAndPendingNotesByAreaIdAndUserIdAndSourceIds(
+                areaId, userId, sourceIds, today);
+        } else {
+            // Load all notes (advanced review)
+            eligibleNotes = noteRepository.findByAreaIdAndUserIdAndSourceIds(areaId, userId, sourceIds);
+        }
         
         if (eligibleNotes.isEmpty()) {
             return new ArrayList<>();

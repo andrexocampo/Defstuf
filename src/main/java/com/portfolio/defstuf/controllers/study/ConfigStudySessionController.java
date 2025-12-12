@@ -20,8 +20,10 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Controller for Study Session Configuration view
@@ -135,7 +137,7 @@ public class ConfigStudySessionController {
     }
     
     /**
-     * Creates a radio button row for an area with note count
+     * Creates a radio button row for an area with note counts (new, pending, total)
      */
     private HBox createAreaRadioButton(Area area, Long userId) {
         HBox row = new HBox(15);
@@ -160,28 +162,49 @@ public class ConfigStudySessionController {
         nameLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #333;");
         nameLabel.setPrefWidth(200);
         
-        // Note count label
-        Label countLabel = new Label();
-        countLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #666;");
-        countLabel.setUserData("countLabel"); // Tag to identify this label later
+        // Counters container
+        HBox countersBox = new HBox(10);
+        countersBox.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        countersBox.setUserData("countersBox"); // Tag to identify this container later
         
-        // Get note count for this area
+        // Get note counts for this area
         try {
-            int noteCount = noteRepository.countByAreaIdAndUserId(area.getId(), userId);
-            String countText = noteCount == 1 ? "1 definition" : noteCount + " definitions";
-            countLabel.setText("(" + countText + " pending)");
+            List<Long> allSourceIds = null; // For counting without source filter
+            LocalDate today = LocalDate.now();
             
-            if (noteCount == 0) {
-                countLabel.setText("(0 definitions - cannot start session)");
-                countLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #d32f2f;");
+            int newNotes = noteRepository.countNewNotesByAreaIdAndUserIdAndSourceIds(
+                area.getId(), userId, allSourceIds);
+            int pendingNotes = noteRepository.countPendingNotesByAreaIdAndUserIdAndSourceIds(
+                area.getId(), userId, allSourceIds, today);
+            int totalNotes = noteRepository.countByAreaIdAndUserIdAndSourceIds(
+                area.getId(), userId, allSourceIds);
+            
+            // Create labels for each counter
+            Label newLabel = new Label(String.format("New: %d", newNotes));
+            Label pendingLabel = new Label(String.format("Pending: %d", pendingNotes));
+            Label totalLabel = new Label(String.format("Total: %d", totalNotes));
+            
+            newLabel.setStyle("-fx-text-fill: #2196F3; -fx-font-size: 12px;");
+            pendingLabel.setStyle("-fx-text-fill: #FF9800; -fx-font-size: 12px;");
+            totalLabel.setStyle("-fx-text-fill: #666; -fx-font-size: 12px;");
+            
+            countersBox.getChildren().addAll(newLabel, pendingLabel, totalLabel);
+            
+            if (totalNotes == 0) {
+                Label errorLabel = new Label("(0 definitions - cannot start session)");
+                errorLabel.setStyle("-fx-text-fill: #d32f2f; -fx-font-size: 12px;");
+                countersBox.getChildren().clear();
+                countersBox.getChildren().add(errorLabel);
                 radioButton.setDisable(true);
             }
         } catch (SQLException e) {
-            countLabel.setText("(Error loading count)");
-            countLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #d32f2f;");
+            Label errorLabel = new Label("(Error loading count)");
+            errorLabel.setStyle("-fx-text-fill: #d32f2f; -fx-font-size: 12px;");
+            countersBox.getChildren().clear();
+            countersBox.getChildren().add(errorLabel);
         }
         
-        row.getChildren().addAll(radioButton, nameLabel, countLabel);
+        row.getChildren().addAll(radioButton, nameLabel, countersBox);
         
         return row;
     }
@@ -391,35 +414,42 @@ public class ConfigStudySessionController {
         
         try {
             Long userId = SessionManager.getInstance().getCurrentUserId();
+            LocalDate today = LocalDate.now();
             
             // Get selected source IDs
             List<Long> selectedSourceIds = getSelectedSourceIds();
             
             // Count notes for selected sources
-            int noteCount = noteRepository.countByAreaIdAndUserIdAndSourceIds(
-                selectedArea.getId(), userId, selectedSourceIds
-            );
+            int newNotes = noteRepository.countNewNotesByAreaIdAndUserIdAndSourceIds(
+                selectedArea.getId(), userId, selectedSourceIds.isEmpty() ? null : selectedSourceIds);
+            int pendingNotes = noteRepository.countPendingNotesByAreaIdAndUserIdAndSourceIds(
+                selectedArea.getId(), userId, selectedSourceIds.isEmpty() ? null : selectedSourceIds, today);
+            int totalNotes = noteRepository.countByAreaIdAndUserIdAndSourceIds(
+                selectedArea.getId(), userId, selectedSourceIds.isEmpty() ? null : selectedSourceIds);
             
-            // Update the area's note count label
+            // Update the area's count labels
             RadioButton selectedRadio = (RadioButton) areaToggleGroup.getSelectedToggle();
             if (selectedRadio != null) {
                 HBox areaRow = (HBox) selectedRadio.getParent();
-                // Find the count label in the area row (third child)
-                if (areaRow.getChildren().size() >= 3) {
-                    Label countLabel = (Label) areaRow.getChildren().get(2);
-                    String countText = noteCount == 1 ? "1 definition" : noteCount + " definitions";
+                // Find the counters box in the area row (third child)
+                if (areaRow.getChildren().size() >= 3 && areaRow.getChildren().get(2) instanceof HBox) {
+                    HBox countersBox = (HBox) areaRow.getChildren().get(2);
+                    countersBox.getChildren().clear();
                     
-                    if (selectedSourceIds.isEmpty()) {
-                        countLabel.setText("(" + countText + " pending)");
+                    if (totalNotes == 0) {
+                        Label errorLabel = new Label("(0 definitions - cannot start session)");
+                        errorLabel.setStyle("-fx-text-fill: #d32f2f; -fx-font-size: 12px;");
+                        countersBox.getChildren().add(errorLabel);
                     } else {
-                        countLabel.setText("(" + countText + " pending with selected sources)");
-                    }
-                    
-                    if (noteCount == 0) {
-                        countLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #d32f2f;");
-                        countLabel.setText("(0 definitions - cannot start session)");
-                    } else {
-                        countLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #666;");
+                        Label newLabel = new Label(String.format("New: %d", newNotes));
+                        Label pendingLabel = new Label(String.format("Pending: %d", pendingNotes));
+                        Label totalLabel = new Label(String.format("Total: %d", totalNotes));
+                        
+                        newLabel.setStyle("-fx-text-fill: #2196F3; -fx-font-size: 12px;");
+                        pendingLabel.setStyle("-fx-text-fill: #FF9800; -fx-font-size: 12px;");
+                        totalLabel.setStyle("-fx-text-fill: #666; -fx-font-size: 12px;");
+                        
+                        countersBox.getChildren().addAll(newLabel, pendingLabel, totalLabel);
                     }
                 }
             }
@@ -465,6 +495,34 @@ public class ConfigStudySessionController {
             }
             
             Area selectedArea = (Area) selectedRadio.getUserData();
+            Long userId = SessionManager.getInstance().getCurrentUserId();
+            List<Long> selectedSourceIds = getSelectedSourceIds();
+            LocalDate today = LocalDate.now();
+            
+            // Check how many new and pending notes there are
+            int newNotes = noteRepository.countNewNotesByAreaIdAndUserIdAndSourceIds(
+                selectedArea.getId(), userId, selectedSourceIds.isEmpty() ? null : selectedSourceIds);
+            int pendingNotes = noteRepository.countPendingNotesByAreaIdAndUserIdAndSourceIds(
+                selectedArea.getId(), userId, selectedSourceIds.isEmpty() ? null : selectedSourceIds, today);
+            
+            boolean hasNewOrPending = (newNotes > 0 || pendingNotes > 0);
+            boolean isAdvancedReview = !hasNewOrPending;
+            
+            // If no new or pending notes, show confirmation dialog for advanced review
+            if (isAdvancedReview) {
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Advanced Review Session");
+                alert.setHeaderText(null);
+                alert.setContentText(
+                    "There are no new or pending notes for today.\n" +
+                    "Would you like to start an advanced review session with all available notes?"
+                );
+                
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.isEmpty() || result.get() != ButtonType.OK) {
+                    return; // User cancelled
+                }
+            }
             
             // Get configuration values
             Integer timeLimit = timeLimitCombo.getValue();
@@ -492,9 +550,6 @@ public class ConfigStudySessionController {
                                + java.time.LocalDateTime.now().format(
                                    java.time.format.DateTimeFormatter.ofPattern("MMM dd, HH:mm"));
             
-            // Get selected source IDs
-            List<Long> selectedSourceIds = getSelectedSourceIds();
-            
             // Create study session
             StudySession session = studySessionService.createStudySession(
                 sessionName,
@@ -504,18 +559,25 @@ public class ConfigStudySessionController {
                 reviewOrder
             );
             
-            // Navigate to study session view
-            navigateToStudySessionView(session, selectedArea.getId(), selectedSourceIds);
+            // Navigate to study session view with flag indicating if we should only show new/pending
+            navigateToStudySessionView(session, selectedArea.getId(), selectedSourceIds, hasNewOrPending);
             
         } catch (StudySessionService.StudySessionException e) {
             showError("Error creating study session: " + e.getMessage());
+        } catch (SQLException e) {
+            showError("Error checking note status: " + e.getMessage());
         }
     }
     
     /**
      * Navigates to the study session view
+     * 
+     * @param session The study session
+     * @param areaId The area ID
+     * @param sourceIds List of source IDs
+     * @param onlyNewAndPending If true, only load new and pending notes; if false, load all notes
      */
-    private void navigateToStudySessionView(StudySession session, Long areaId, List<Long> sourceIds) {
+    private void navigateToStudySessionView(StudySession session, Long areaId, List<Long> sourceIds, boolean onlyNewAndPending) {
         try {
             Stage stage = (Stage) startSessionButton.getScene().getWindow();
             FXMLLoader loader = new FXMLLoader(
@@ -524,7 +586,7 @@ public class ConfigStudySessionController {
             Parent root = loader.load();
             
             StudySessionController controller = loader.getController();
-            controller.setStudySession(session, areaId, sourceIds);
+            controller.setStudySession(session, areaId, sourceIds, onlyNewAndPending);
             
             Scene scene = new Scene(root);
             stage.setScene(scene);

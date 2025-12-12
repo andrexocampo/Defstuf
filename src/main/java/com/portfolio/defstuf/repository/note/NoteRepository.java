@@ -4,6 +4,7 @@ import com.portfolio.defstuf.models.note.Note;
 import com.portfolio.defstuf.repository.DatabaseConnection;
 
 import java.sql.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -268,6 +269,154 @@ public class NoteRepository {
             if (sourceIds != null && !sourceIds.isEmpty()) {
                 for (int i = 0; i < sourceIds.size(); i++) {
                     stmt.setLong(3 + i, sourceIds.get(i));
+                }
+            }
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    notes.add(mapResultSetToNote(rs));
+                }
+            }
+        }
+        return notes;
+    }
+    
+    /**
+     * Counts new notes (notes without any scheduled review)
+     * A note is considered "new" if it has NO ScheduledReview at all (never been studied)
+     * 
+     * @param areaId The area ID
+     * @param userId The user ID
+     * @param sourceIds List of source IDs to filter by (null or empty means all sources)
+     * @return Number of new notes matching the criteria
+     * @throws SQLException If database error occurs
+     */
+    public int countNewNotesByAreaIdAndUserIdAndSourceIds(Long areaId, Long userId, List<Long> sourceIds) throws SQLException {
+        String baseSql = "SELECT COUNT(DISTINCT n.id) FROM notes n " +
+                        "LEFT JOIN scheduled_reviews sr ON n.id = sr.note_id AND sr.user_id = ? " +
+                        "WHERE n.area_id = ? AND n.user_id = ? AND sr.id IS NULL";
+        
+        String sql;
+        if (sourceIds == null || sourceIds.isEmpty()) {
+            sql = baseSql;
+        } else {
+            String placeholders = String.join(",", java.util.Collections.nCopies(sourceIds.size(), "?"));
+            sql = baseSql + " AND (n.source_id IN (" + placeholders + ") OR n.source_id IS NULL)";
+        }
+        
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            int paramIndex = 1;
+            stmt.setLong(paramIndex++, userId);
+            stmt.setLong(paramIndex++, areaId);
+            stmt.setLong(paramIndex++, userId);
+            
+            if (sourceIds != null && !sourceIds.isEmpty()) {
+                for (Long sourceId : sourceIds) {
+                    stmt.setLong(paramIndex++, sourceId);
+                }
+            }
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        }
+        return 0;
+    }
+    
+    /**
+     * Counts pending notes (notes with pending scheduled review for today or before)
+     * 
+     * @param areaId The area ID
+     * @param userId The user ID
+     * @param sourceIds List of source IDs to filter by (null or empty means all sources)
+     * @param today The current date to compare scheduled_date against
+     * @return Number of pending notes matching the criteria
+     * @throws SQLException If database error occurs
+     */
+    public int countPendingNotesByAreaIdAndUserIdAndSourceIds(Long areaId, Long userId, List<Long> sourceIds, LocalDate today) throws SQLException {
+        String baseSql = "SELECT COUNT(DISTINCT n.id) FROM notes n " +
+                        "INNER JOIN scheduled_reviews sr ON n.id = sr.note_id AND sr.user_id = ? " +
+                        "WHERE n.area_id = ? AND n.user_id = ? " +
+                        "AND sr.review_status = 'pending' AND sr.scheduled_date <= ?";
+        
+        String sql;
+        if (sourceIds == null || sourceIds.isEmpty()) {
+            sql = baseSql;
+        } else {
+            String placeholders = String.join(",", java.util.Collections.nCopies(sourceIds.size(), "?"));
+            sql = baseSql + " AND (n.source_id IN (" + placeholders + ") OR n.source_id IS NULL)";
+        }
+        
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            int paramIndex = 1;
+            stmt.setLong(paramIndex++, userId);
+            stmt.setLong(paramIndex++, areaId);
+            stmt.setLong(paramIndex++, userId);
+            stmt.setDate(paramIndex++, Date.valueOf(today));
+            
+            if (sourceIds != null && !sourceIds.isEmpty()) {
+                for (Long sourceId : sourceIds) {
+                    stmt.setLong(paramIndex++, sourceId);
+                }
+            }
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        }
+        return 0;
+    }
+    
+    /**
+     * Finds new and pending notes (new notes + notes with pending scheduled review for today or before)
+     * - New notes: notes with NO ScheduledReview at all
+     * - Pending notes: notes with ScheduledReview status='pending' and scheduled_date <= today
+     * 
+     * @param areaId The area ID
+     * @param userId The user ID
+     * @param sourceIds List of source IDs to filter by (null or empty means all sources)
+     * @param today The current date to compare scheduled_date against
+     * @return List of notes that are new or pending
+     * @throws SQLException If database error occurs
+     */
+    public List<Note> findNewAndPendingNotesByAreaIdAndUserIdAndSourceIds(Long areaId, Long userId, List<Long> sourceIds, LocalDate today) throws SQLException {
+        String baseSql = "SELECT DISTINCT n.id, n.user_id, n.title, n.source_id, n.description, n.area_id, n.note_type_id, n.created_at, n.updated_at " +
+                        "FROM notes n " +
+                        "LEFT JOIN scheduled_reviews sr ON n.id = sr.note_id AND sr.user_id = ? " +
+                        "WHERE n.area_id = ? AND n.user_id = ? " +
+                        "AND (sr.id IS NULL OR (sr.review_status = 'pending' AND sr.scheduled_date <= ?))";
+        
+        String sql;
+        if (sourceIds == null || sourceIds.isEmpty()) {
+            sql = baseSql + " ORDER BY n.title, n.created_at";
+        } else {
+            String placeholders = String.join(",", java.util.Collections.nCopies(sourceIds.size(), "?"));
+            sql = baseSql + " AND (n.source_id IN (" + placeholders + ") OR n.source_id IS NULL) " +
+                  "ORDER BY n.title, n.created_at";
+        }
+        
+        List<Note> notes = new ArrayList<>();
+        
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            int paramIndex = 1;
+            stmt.setLong(paramIndex++, userId);
+            stmt.setLong(paramIndex++, areaId);
+            stmt.setLong(paramIndex++, userId);
+            stmt.setDate(paramIndex++, Date.valueOf(today));
+            
+            if (sourceIds != null && !sourceIds.isEmpty()) {
+                for (Long sourceId : sourceIds) {
+                    stmt.setLong(paramIndex++, sourceId);
                 }
             }
             

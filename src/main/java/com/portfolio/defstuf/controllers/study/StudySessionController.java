@@ -1,5 +1,6 @@
 package com.portfolio.defstuf.controllers.study;
 
+import com.portfolio.defstuf.controllers.MainViewController;
 import com.portfolio.defstuf.models.area.Area;
 import com.portfolio.defstuf.models.note.Note;
 import com.portfolio.defstuf.models.note.NoteImage;
@@ -140,8 +141,13 @@ public class StudySessionController {
     /**
      * Sets the study session and starts it
      * Called from ConfigStudySessionController
+     * 
+     * @param session The study session
+     * @param areaId The area ID
+     * @param sourceIds List of source IDs
+     * @param onlyNewAndPending If true, only load new and pending notes; if false, load all notes
      */
-    public void setStudySession(StudySession session, Long areaId, List<Long> sourceIds) {
+    public void setStudySession(StudySession session, Long areaId, List<Long> sourceIds, boolean onlyNewAndPending) {
         this.currentSession = session;
         this.sessionStartTime = LocalDateTime.now();
         this.totalElapsedSeconds = 0;
@@ -156,7 +162,8 @@ public class StudySessionController {
                 sourceIds,
                 session.getCardsLimit(),
                 session.getReviewOrder(),
-                area
+                area,
+                onlyNewAndPending
             );
             
             if (noteGroups.isEmpty()) {
@@ -674,7 +681,16 @@ public class StudySessionController {
                 getClass().getResource("/com/portfolio/defstuf/views/MainView.fxml")
             );
             Parent root = loader.load();
-            Scene scene = new Scene(root);
+            
+            MainViewController controller = loader.getController();
+            controller.setPrimaryStage(stage);
+            
+            Scene scene = new Scene(root, 900, 700);
+            scene.getStylesheets().add(
+                getClass().getResource("/com/portfolio/defstuf/styles/main.css").toExternalForm()
+            );
+            
+            stage.setTitle("DefStuf - Main");
             stage.setScene(scene);
             stage.centerOnScreen();
         } catch (Exception e) {
