@@ -132,14 +132,13 @@ public class AreaDetailController {
             controller.setPrimaryStage(primaryStage);
             controller.setArea(currentArea);
             
-            Scene scene = new Scene(root, 500, 400);
+            Scene scene = new Scene(root);
             scene.getStylesheets().add(
                 getClass().getResource("/com/portfolio/defstuf/styles/main.css").toExternalForm()
             );
             
+            preserveWindowState(primaryStage, scene, 600, 550);
             primaryStage.setTitle("DefStuf - Edit Area");
-            primaryStage.setScene(scene);
-            primaryStage.show();
         } catch (Exception e) {
             e.printStackTrace();
             showError("Error opening edit area view: " + e.getMessage());
@@ -202,17 +201,59 @@ public class AreaDetailController {
             controller.setPrimaryStage(primaryStage);
             controller.refreshAreas();
             
-            Scene scene = new Scene(root, 900, 700);
+            Scene scene = new Scene(root);
             scene.getStylesheets().add(
                 getClass().getResource("/com/portfolio/defstuf/styles/main.css").toExternalForm()
             );
             
+            preserveWindowState(primaryStage, scene, 900, 750);
             primaryStage.setTitle("DefStuf - Manage Areas");
-            primaryStage.setScene(scene);
-            primaryStage.show();
         } catch (Exception e) {
             e.printStackTrace();
             showError("Error returning to manage areas: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Preserves window state (size, position, maximized) when changing scenes
+     */
+    private void preserveWindowState(Stage stage, Scene newScene, double defaultWidth, double defaultHeight) {
+        boolean wasMaximized = stage.isMaximized();
+        boolean wasIconified = stage.isIconified();
+        double currentWidth = stage.getWidth();
+        double currentHeight = stage.getHeight();
+        double currentX = stage.getX();
+        double currentY = stage.getY();
+        
+        stage.setScene(newScene);
+        
+        // If window was maximized, restore that state
+        if (wasMaximized) {
+            stage.setMaximized(true);
+        } else {
+            // If window had a reasonable size, preserve it, otherwise use default
+            if (currentWidth > 100 && currentHeight > 100) {
+                stage.setWidth(currentWidth);
+                stage.setHeight(currentHeight);
+            } else {
+                stage.setWidth(defaultWidth);
+                stage.setHeight(defaultHeight);
+            }
+            // Preserve position if window wasn't maximized
+            if (currentX >= 0 && currentY >= 0) {
+                stage.setX(currentX);
+                stage.setY(currentY);
+            }
+        }
+        
+        // Restore iconified state if it was
+        if (wasIconified) {
+            stage.setIconified(true);
+        }
+        
+        // Only show if not already showing
+        if (!stage.isShowing()) {
+            stage.show();
         }
     }
     

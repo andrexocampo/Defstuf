@@ -7,60 +7,59 @@
 <BorderPane xmlns="http://javafx.com/javafx/11.0.1" 
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.portfolio.defstuf.controllers.area.AreaDetailController"
-            style="-fx-background-color: #f5f5f5;">
+            styleClass="dark-background">
    
    <top>
-      <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 20;">
-         <HBox spacing="10" alignment="CENTER_LEFT">
-            <Button text="← Back" onAction="#handleBack" 
-                    style="-fx-background-color: #666; -fx-text-fill: white; -fx-padding: 8 16;" />
-            <Label fx:id="titleLabel" text="Area Detail" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
+      <VBox spacing="15" styleClass="top-bar">
+         <HBox spacing="20" alignment="CENTER_LEFT">
+            <Button text="← Back" onAction="#handleBack" styleClass="neu-button-back" />
+            <Label fx:id="titleLabel" text="Area Detail" styleClass="section-title" />
          </HBox>
          <Separator />
       </VBox>
    </top>
    
    <center>
-      <ScrollPane fitToWidth="true" fitToHeight="true">
-         <VBox spacing="20" style="-fx-padding: 40; -fx-max-width: 600;">
+      <ScrollPane fitToWidth="true" fitToHeight="true" styleClass="scroll-pane">
+         <VBox spacing="25" style="-fx-padding: 40; -fx-max-width: 700;">
             
             <!-- Basic Information Section -->
-            <VBox spacing="15" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 8;">
-               <Label text="Basic Information" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
+            <VBox spacing="15" styleClass="neumorphic-panel">
+               <Label text="Basic Information" styleClass="subsection-title" />
                <Separator />
                
-               <VBox spacing="10">
-                  <HBox spacing="10">
-                     <Label text="Name:" style="-fx-font-weight: bold; -fx-min-width: 120;" />
-                     <Label fx:id="nameLabel" text="" style="-fx-font-size: 14px;" />
+               <VBox spacing="12">
+                  <HBox spacing="15">
+                     <Label text="Name:" styleClass="neu-label-light" style="-fx-min-width: 120;" />
+                     <Label fx:id="nameLabel" text="" styleClass="neu-label-light" />
                   </HBox>
                   
-                  <HBox spacing="10">
-                     <Label text="Code:" style="-fx-font-weight: bold; -fx-min-width: 120;" />
-                     <Label fx:id="codeLabel" text="" style="-fx-font-size: 14px;" />
+                  <HBox spacing="15">
+                     <Label text="Code:" styleClass="neu-label-light" style="-fx-min-width: 120;" />
+                     <Label fx:id="codeLabel" text="" styleClass="neu-label-light" />
                   </HBox>
                   
-                  <HBox spacing="10">
-                     <Label text="Created:" style="-fx-font-weight: bold; -fx-min-width: 120;" />
-                     <Label fx:id="createdLabel" text="" style="-fx-font-size: 14px;" />
+                  <HBox spacing="15">
+                     <Label text="Created:" styleClass="neu-label-light" style="-fx-min-width: 120;" />
+                     <Label fx:id="createdLabel" text="" styleClass="neu-label-light" />
                   </HBox>
                </VBox>
             </VBox>
             
             <!-- Statistics Section (Prepared for future) -->
-            <VBox spacing="15" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 8;">
-               <Label text="Statistics" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
+            <VBox spacing="15" styleClass="neumorphic-panel">
+               <Label text="Statistics" styleClass="subsection-title" />
                <Separator />
                <Label fx:id="statisticsLabel" text="No statistics available yet." 
-                      style="-fx-text-fill: #666;" />
+                      styleClass="status-label" />
             </VBox>
             
             <!-- Notes Section (Prepared for future) -->
-            <VBox spacing="15" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 8;">
-               <Label text="Notes in this Area" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
+            <VBox spacing="15" styleClass="neumorphic-panel">
+               <Label text="Notes in this Area" styleClass="subsection-title" />
                <Separator />
                <Label fx:id="notesLabel" text="No notes available yet." 
-                      style="-fx-text-fill: #666;" />
+                      styleClass="status-label" />
             </VBox>
             
          </VBox>
@@ -68,12 +67,11 @@
    </center>
    
    <bottom>
-      <HBox spacing="10" alignment="CENTER_RIGHT" 
-            style="-fx-background-color: white; -fx-padding: 20;">
+      <HBox spacing="15" alignment="CENTER_RIGHT" styleClass="bottom-bar">
          <Button fx:id="deleteButton" text="Delete Area" onAction="#handleDelete" 
-                 style="-fx-background-color: #d32f2f; -fx-text-fill: white; -fx-padding: 10 20;" />
+                 styleClass="neu-button-secondary" style="-fx-background-color: #d32f2f; -fx-text-fill: white;" />
          <Button fx:id="editButton" text="Edit Area" onAction="#handleEdit" 
-                 style="-fx-background-color: #0078d4; -fx-text-fill: white; -fx-padding: 10 20;" />
+                 styleClass="neu-button-primary" />
       </HBox>
    </bottom>
 </BorderPane>

@@ -8,71 +8,72 @@
 <BorderPane xmlns="http://javafx.com/javafx/11.0.1" 
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.portfolio.defstuf.controllers.study.StudySessionController"
-            style="-fx-background-color: #f5f5f5;">
+            styleClass="dark-background">
    
    <top>
       <!-- Progress Panel - FR-05.6: Real-time progress panel -->
-      <VBox fx:id="progressPanel" spacing="10" style="-fx-background-color: white; -fx-padding: 20;">
-         <Label text="Study Session Progress" style="-fx-font-size: 20px; -fx-font-weight: bold;" />
+      <VBox fx:id="progressPanel" spacing="15" styleClass="top-bar">
+         <Label text="Study Session Progress" styleClass="subsection-title" />
          <Separator />
          
          <HBox spacing="30" alignment="CENTER_LEFT">
             <!-- Progress: X of Y definitions -->
-            <Label fx:id="progressLabel" text="Progress: 0/0" style="-fx-font-size: 14px;" />
+            <Label fx:id="progressLabel" text="Progress: 0/0" styleClass="neu-label-light" />
             
             <!-- Elapsed time: MM:SS -->
-            <Label fx:id="elapsedTimeLabel" text="Time: 00:00" style="-fx-font-size: 14px;" />
+            <Label fx:id="elapsedTimeLabel" text="Time: 00:00" styleClass="neu-label-light" />
             
             <!-- Average time per definition -->
-            <Label fx:id="avgTimeLabel" text="Avg: --" style="-fx-font-size: 14px;" />
+            <Label fx:id="avgTimeLabel" text="Avg: --" styleClass="neu-label-light" />
             
             <!-- Rating distribution -->
             <HBox spacing="10" alignment="CENTER_LEFT">
-               <Label text="Distribution:" style="-fx-font-size: 14px;" />
-               <Label fx:id="forgotCountLabel" text="❌0" style="-fx-font-size: 14px;" />
-               <Label fx:id="hardCountLabel" text="😰0" style="-fx-font-size: 14px;" />
-               <Label fx:id="goodCountLabel" text="✅0" style="-fx-font-size: 14px;" />
-               <Label fx:id="easyCountLabel" text="🚀0" style="-fx-font-size: 14px;" />
+               <Label text="Distribution:" styleClass="neu-label-light" />
+               <Label fx:id="forgotCountLabel" text="❌0" styleClass="neu-label-light" />
+               <Label fx:id="hardCountLabel" text="😰0" styleClass="neu-label-light" />
+               <Label fx:id="goodCountLabel" text="✅0" styleClass="neu-label-light" />
+               <Label fx:id="easyCountLabel" text="🚀0" styleClass="neu-label-light" />
             </HBox>
             
             <!-- Breaks taken -->
-            <Label fx:id="breaksTakenLabel" text="Breaks: 0" style="-fx-font-size: 14px;" />
+            <Label fx:id="breaksTakenLabel" text="Breaks: 0" styleClass="neu-label-light" />
          </HBox>
       </VBox>
    </top>
    
    <center>
-      <VBox spacing="20" style="-fx-padding: 40; -fx-alignment: center;" alignment="CENTER">
+      <VBox spacing="30" style="-fx-padding: 40;" alignment="CENTER" styleClass="dark-background">
          
          <!-- Break Mode View (shown during break) -->
-         <VBox fx:id="breakModeContainer" spacing="20" alignment="CENTER" visible="false" managed="false">
-            <Label text="⏸️ BREAK MODE" style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #666;" />
-            <Label text="Time for a rest!" style="-fx-font-size: 18px; -fx-text-fill: #999;" />
-            <Label fx:id="breakTimeLabel" text="00:00" style="-fx-font-size: 48px; -fx-font-weight: bold; -fx-text-fill: #333;" />
-            <Label fx:id="breakRemainingLabel" text="" style="-fx-font-size: 14px; -fx-text-fill: #666;" />
+         <VBox fx:id="breakModeContainer" spacing="25" alignment="CENTER" visible="false" managed="false" styleClass="neumorphic-panel">
+            <Label text="⏸️ BREAK MODE" styleClass="section-title" />
+            <Label text="Time for a rest!" styleClass="neu-label" style="-fx-font-size: 18px;" />
+            <Label fx:id="breakTimeLabel" text="00:00" styleClass="section-title" style="-fx-font-size: 48px;" />
+            <Label fx:id="breakRemainingLabel" text="" styleClass="status-label" />
             <Button fx:id="endBreakButton" text="End Break" onAction="#handleEndBreak" 
-                    style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-padding: 10 30; -fx-font-size: 14px;" />
+                    styleClass="neu-button-primary" />
          </VBox>
          
          <!-- Study Mode View (shown during study) -->
-         <VBox fx:id="studyModeContainer" spacing="20" alignment="CENTER" minWidth="600">
+         <VBox fx:id="studyModeContainer" spacing="25" alignment="CENTER" minWidth="600" styleClass="neumorphic-panel">
             
             <!-- Area Badge - FR-05.3: Show area clearly -->
             <Label fx:id="areaBadgeLabel" text="" 
-                   style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-padding: 8 20; -fx-background-radius: 20; -fx-font-size: 14px; -fx-font-weight: bold;" />
+                   style="-fx-background-color: #ffa33f; -fx-text-fill: #1e1e1e; -fx-padding: 10 25; -fx-background-radius: 20; -fx-font-size: 14px; -fx-font-weight: bold; -fx-effect: dropshadow(gaussian, rgba(255, 163, 63, 0.4), 8, 0, 0, 3);" />
             
             <!-- Note Title - FR-05.3: Show title initially -->
             <Label fx:id="noteTitleLabel" text="" 
-                   style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-alignment: center; -fx-wrap-text: true;" 
-                   maxWidth="800" wrapText="true" />
+                   styleClass="section-title"
+                   style="-fx-font-size: 32px; -fx-text-alignment: center; -fx-wrap-text: true;" 
+                   maxWidth="800" wrapText="true" alignment="CENTER" />
             
             <!-- Answer Container (hidden until "Show Answer" clicked) - FR-05.3 -->
-            <VBox fx:id="answerContainer" spacing="15" visible="false" managed="false" minWidth="600" maxWidth="900">
-               <Label text="Answers:" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
+            <VBox fx:id="answerContainer" spacing="20" visible="false" managed="false" minWidth="600" maxWidth="900">
+               <Label text="Answers:" styleClass="subsection-title" />
                
                <!-- Container for multiple answer descriptions -->
-               <ScrollPane fitToWidth="true" maxHeight="400" style="-fx-background-color: transparent;">
-                  <VBox fx:id="descriptionsContainer" spacing="20" style="-fx-padding: 10;">
+               <ScrollPane fitToWidth="true" minHeight="200" prefHeight="300" maxHeight="450" styleClass="scroll-pane">
+                  <VBox fx:id="descriptionsContainer" spacing="20" style="-fx-padding: 20;">
                      <!-- Will be populated dynamically with multiple descriptions and images -->
                   </VBox>
                </ScrollPane>
@@ -80,34 +81,37 @@
             
             <!-- Show Answer Button - FR-05.3 -->
             <Button fx:id="showAnswerButton" text="Show Answer" onAction="#handleShowAnswer"
-                    style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-padding: 12 40; -fx-font-size: 16px;" />
+                    styleClass="neu-button-primary" />
             
             <!-- Rating Buttons - FR-05.4: Rating options with keyboard shortcuts -->
             <HBox fx:id="ratingButtonsContainer" spacing="15" alignment="CENTER" visible="false" managed="false">
                <Button fx:id="forgotButton" text="1 ❌ Forgot" onAction="#handleRatingForgot"
-                       style="-fx-background-color: #f44336; -fx-text-fill: white; -fx-padding: 12 20; -fx-font-size: 14px;" />
+                       styleClass="neu-button-secondary" style="-fx-background-color: #f44336; -fx-text-fill: white;" />
                <Button fx:id="hardButton" text="2 😰 Hard" onAction="#handleRatingHard"
-                       style="-fx-background-color: #FF9800; -fx-text-fill: white; -fx-padding: 12 20; -fx-font-size: 14px;" />
+                       styleClass="neu-button-secondary" style="-fx-background-color: #FF9800; -fx-text-fill: white;" />
                <Button fx:id="goodButton" text="3 ✅ Good" onAction="#handleRatingGood"
-                       style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-padding: 12 20; -fx-font-size: 14px;" />
+                       styleClass="neu-button-secondary" style="-fx-background-color: #4CAF50; -fx-text-fill: white;" />
                <Button fx:id="easyButton" text="4 🚀 Easy" onAction="#handleRatingEasy"
-                       style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-padding: 12 20; -fx-font-size: 14px;" />
+                       styleClass="neu-button-secondary" style="-fx-background-color: #2196F3; -fx-text-fill: white;" />
             </HBox>
          </VBox>
       </VBox>
    </center>
    
    <bottom>
-      <HBox spacing="15" alignment="CENTER" style="-fx-padding: 20; -fx-background-color: white;">
+      <HBox spacing="15" alignment="CENTER" styleClass="bottom-bar">
          <!-- Break Button - FR-05.7: Break button -->
          <Button fx:id="breakButton" text="Break" onAction="#handleBreak"
-                 style="-fx-background-color: #FF9800; -fx-text-fill: white; -fx-padding: 10 25; -fx-font-size: 14px;" />
+                 styleClass="neu-button-secondary" style="-fx-background-color: #FF9800; -fx-text-fill: white;" />
          
          <!-- Finish Button - FR-05.7: Finish session button -->
          <Button fx:id="finishButton" text="Finish Session" onAction="#handleFinish"
-                 style="-fx-background-color: #666; -fx-text-fill: white; -fx-padding: 10 25; -fx-font-size: 14px;" />
+                 styleClass="neu-button-secondary" />
       </HBox>
    </bottom>
 </BorderPane>
+
+
+
 
 

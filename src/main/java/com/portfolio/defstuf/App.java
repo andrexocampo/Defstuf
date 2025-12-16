@@ -40,7 +40,7 @@ public class App extends Application {
         LoginController controller = loader.getController();
         controller.setPrimaryStage(stage);
         
-        Scene scene = new Scene(root, 500, 400);
+        Scene scene = new Scene(root, 600, 550);
         scene.getStylesheets().add(
             App.class.getResource("/com/portfolio/defstuf/styles/main.css")
                 .toExternalForm()
@@ -48,6 +48,8 @@ public class App extends Application {
         
         stage.setTitle("DefStuf - Login");
         stage.setScene(scene);
+        stage.setMinWidth(500);
+        stage.setMinHeight(450);
         stage.show();
     }
     
@@ -63,13 +65,15 @@ public class App extends Application {
         MainViewController controller = loader.getController();
         controller.setPrimaryStage(stage);
         
-        Scene scene = new Scene(root, 640, 480);
+        Scene scene = new Scene(root, 900, 750);
         scene.getStylesheets().add(
             App.class.getResource("/com/portfolio/defstuf/styles/main.css")
                 .toExternalForm()
         );
         
         stage.setTitle("DefStuf");
+        stage.setMinWidth(800);
+        stage.setMinHeight(600);
         stage.setScene(scene);
         stage.show();
     }

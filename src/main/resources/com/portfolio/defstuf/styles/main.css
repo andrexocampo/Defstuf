@@ -1,13 +1,478 @@
-/* Estilos principales de la aplicación */
+/* Modern Neumorphic Design for DefStuf */
+/* Color Palette - Dark theme with Orange accent (#ffa33f) and beige (#faf5e9) for accents */
 
 .root {
-    -fx-font-family: "Segoe UI", Arial, sans-serif;
+    -fx-background-color: #1e1e1e; /* Dark charcoal background */
+    -fx-font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, "Roboto", sans-serif;
     -fx-font-size: 14px;
-    -fx-background-color: #f4f4f4;
 }
 
-.label {
+/* Main container with dark background */
+.dark-background {
+    -fx-background-color: #1e1e1e;
+}
+
+/* Neumorphic Panel - Raised effect */
+.neumorphic-panel {
+    -fx-background-color: #252525;
+    -fx-background-radius: 20;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 20, 0, 0, 10),
+                dropshadow(gaussian, rgba(255, 255, 255, 0.05), 10, 0, 0, -5);
+    -fx-padding: 30;
+}
+
+/* Neumorphic Panel - Inset effect (for containers) */
+.neumorphic-inset {
+    -fx-background-color: #1e1e1e;
+    -fx-background-radius: 15;
+    -fx-border-color: rgba(0, 0, 0, 0.2);
+    -fx-border-radius: 15;
+    -fx-border-width: 1;
+}
+
+/* Section Title */
+.section-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #ffffff;
+    -fx-padding: 0 0 20 0;
+}
+
+/* Subsection Title */
+.subsection-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #ffffff;
+    -fx-padding: 0 0 15 0;
+}
+
+/* Labels */
+.neu-label {
+    -fx-text-fill: #b0b0b0;
+    -fx-font-size: 14px;
+}
+
+.neu-label-light {
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 14px;
+}
+
+/* Area Label - with beige accent */
+.area-label {
+    -fx-text-fill: #faf5e9;
+    -fx-font-size: 14px;
+}
+
+/* Status Labels */
+.status-label {
+    -fx-text-fill: #888888;
+    -fx-font-size: 12px;
+}
+
+.status-label-error {
+    -fx-text-fill: #ff6b6b;
+    -fx-font-size: 12px;
+}
+
+/* Neumorphic Button - Primary (Orange accent) */
+.neu-button-primary {
+    -fx-background-color: #ffa33f;
+    -fx-text-fill: #1e1e1e;
     -fx-font-size: 16px;
-    -fx-text-fill: #333333;
+    -fx-font-weight: bold;
+    -fx-background-radius: 12;
+    -fx-padding: 14 40;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(255, 163, 63, 0.4), 15, 0, 0, 5);
 }
 
+.neu-button-primary:hover {
+    -fx-background-color: #ffb366;
+    -fx-effect: dropshadow(gaussian, rgba(255, 163, 63, 0.6), 20, 0, 0, 8);
+}
+
+.neu-button-primary:pressed {
+    -fx-background-color: #e8922c;
+    -fx-effect: dropshadow(gaussian, rgba(255, 163, 63, 0.2), 10, 0, 0, 3);
+}
+
+.neu-button-primary:disabled {
+    -fx-background-color: #444444;
+    -fx-text-fill: #888888;
+    -fx-effect: none;
+}
+
+/* Neumorphic Button - Secondary */
+.neu-button-secondary {
+    -fx-background-color: #2d2d2d;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 14px;
+    -fx-background-radius: 12;
+    -fx-padding: 12 30;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 10, 0, 0, 5);
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-width: 1;
+    -fx-border-radius: 12;
+}
+
+.neu-button-secondary:hover {
+    -fx-background-color: #353535;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.4), 15, 0, 0, 8);
+}
+
+.neu-button-secondary:pressed {
+    -fx-background-color: #252525;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 5, 0, 0, 3);
+}
+
+/* Back Button */
+.neu-button-back {
+    -fx-background-color: transparent;
+    -fx-text-fill: #ffa33f;
+    -fx-font-size: 14px;
+    -fx-background-radius: 10;
+    -fx-padding: 10 20;
+    -fx-cursor: hand;
+    -fx-border-color: rgba(255, 163, 63, 0.3);
+    -fx-border-width: 1;
+    -fx-border-radius: 10;
+}
+
+.neu-button-back:hover {
+    -fx-background-color: rgba(255, 163, 63, 0.1);
+    -fx-border-color: #ffa33f;
+}
+
+/* Radio Button - Neumorphic Style */
+.radio-button {
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 14px;
+}
+
+.radio-button .radio {
+    -fx-background-color: #2d2d2d;
+    -fx-background-radius: 50%;
+    -fx-border-color: rgba(255, 163, 63, 0.5);
+    -fx-border-width: 2;
+    -fx-border-radius: 50%;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 5, 0, 0, 2);
+}
+
+.radio-button:selected .radio {
+    -fx-background-color: #ffa33f;
+    -fx-border-color: #ffa33f;
+}
+
+.radio-button:selected .dot {
+    -fx-background-color: #1e1e1e;
+}
+
+/* CheckBox - Neumorphic Style */
+.check-box {
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 14px;
+}
+
+.check-box .box {
+    -fx-background-color: #2d2d2d;
+    -fx-background-radius: 4;
+    -fx-border-color: rgba(255, 163, 63, 0.5);
+    -fx-border-width: 2;
+    -fx-border-radius: 4;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 5, 0, 0, 2);
+}
+
+.check-box:selected .box {
+    -fx-background-color: #ffa33f;
+    -fx-border-color: #ffa33f;
+}
+
+.check-box:selected .mark {
+    -fx-background-color: #1e1e1e;
+}
+
+/* ComboBox - Neumorphic Style */
+.combo-box {
+    -fx-background-color: #2d2d2d;
+    -fx-background-radius: 10;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-width: 1;
+    -fx-border-radius: 10;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 8, 0, 0, 4);
+}
+
+.combo-box:hover {
+    -fx-background-color: #353535;
+    -fx-border-color: rgba(255, 163, 63, 0.5);
+}
+
+.combo-box .list-cell {
+    -fx-background-color: #2d2d2d;
+    -fx-text-fill: #ffffff;
+    -fx-padding: 8 12;
+}
+
+.combo-box .arrow-button {
+    -fx-background-color: transparent;
+}
+
+.combo-box .arrow {
+    -fx-background-color: #ffa33f;
+}
+
+.combo-box-popup .list-view {
+    -fx-background-color: #2d2d2d;
+    -fx-background-radius: 10;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 20, 0, 0, 10);
+}
+
+.combo-box-popup .list-cell:hover {
+    -fx-background-color: #ffa33f;
+    -fx-text-fill: #1e1e1e;
+}
+
+/* TextField - Neumorphic Style */
+.text-field, .password-field {
+    -fx-background-color: #252525;
+    -fx-text-fill: #ffffff;
+    -fx-background-radius: 10;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-width: 1;
+    -fx-border-radius: 10;
+    -fx-padding: 10 15;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 5, 0, 0, 2);
+}
+
+.text-field:focused, .password-field:focused {
+    -fx-border-color: #ffa33f;
+    -fx-effect: dropshadow(gaussian, rgba(255, 163, 63, 0.3), 10, 0, 0, 4);
+}
+
+/* TextArea - Neumorphic Style */
+.text-area {
+    -fx-background-color: #252525;
+    -fx-text-fill: #ffffff;
+    -fx-background-radius: 10;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-width: 1;
+    -fx-border-radius: 10;
+    -fx-padding: 10 15;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 5, 0, 0, 2);
+}
+
+.text-area:focused {
+    -fx-border-color: #ffa33f;
+    -fx-effect: dropshadow(gaussian, rgba(255, 163, 63, 0.3), 10, 0, 0, 4);
+}
+
+.text-area .content {
+    -fx-background-color: transparent;
+}
+
+/* Area Row - Neumorphic Card */
+.area-row {
+    -fx-background-color: #252525;
+    -fx-background-radius: 15;
+    -fx-padding: 15 20;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 10, 0, 0, 5);
+    -fx-border-color: rgba(255, 255, 255, 0.05);
+    -fx-border-width: 1;
+    -fx-border-radius: 15;
+}
+
+.area-row:hover {
+    -fx-background-color: #2d2d2d;
+    -fx-border-color: rgba(255, 163, 63, 0.3);
+}
+
+/* Counter Labels */
+.counter-new {
+    -fx-text-fill: #64b5f6;
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+}
+
+.counter-pending {
+    -fx-text-fill: #ffa33f;
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+}
+
+.counter-total {
+    -fx-text-fill: #faf5e9;
+    -fx-font-size: 12px;
+}
+
+/* ScrollPane */
+.scroll-pane {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar:horizontal, .scroll-bar:vertical {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar .track {
+    -fx-background-color: #252525;
+    -fx-background-radius: 10;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: #3d3d3d;
+    -fx-background-radius: 10;
+}
+
+.scroll-bar .thumb:hover {
+    -fx-background-color: #4d4d4d;
+}
+
+/* Separator */
+.separator {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Top Bar */
+.top-bar {
+    -fx-background-color: #252525;
+    -fx-padding: 20 30;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 10, 0, 0, 5);
+}
+
+/* Bottom Bar */
+.bottom-bar {
+    -fx-background-color: #252525;
+    -fx-padding: 25 30;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 10, 0, 0, -5);
+}
+
+/* TableView - Neumorphic Style */
+.table-view {
+    -fx-background-color: #252525;
+    -fx-background-radius: 10;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-width: 1;
+    -fx-border-radius: 10;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 8, 0, 0, 4);
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #2d2d2d;
+}
+
+.table-view .column-header {
+    -fx-background-color: #2d2d2d;
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+}
+
+.table-view .table-cell {
+    -fx-text-fill: #ffffff;
+    -fx-border-color: rgba(255, 255, 255, 0.05);
+}
+
+.table-row-cell {
+    -fx-background-color: #252525;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #ffa33f;
+}
+
+.table-row-cell:selected .table-cell {
+    -fx-text-fill: #1e1e1e;
+}
+
+.table-row-cell:hover {
+    -fx-background-color: #2d2d2d;
+}
+
+/* ListView - Neumorphic Style */
+.list-view {
+    -fx-background-color: #252525;
+    -fx-background-radius: 10;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-width: 1;
+    -fx-border-radius: 10;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 8, 0, 0, 4);
+}
+
+.list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: #ffffff;
+}
+
+.list-cell:selected {
+    -fx-background-color: #ffa33f;
+    -fx-text-fill: #1e1e1e;
+}
+
+.list-cell:hover {
+    -fx-background-color: #2d2d2d;
+}
+
+/* Hyperlink */
+.hyperlink {
+    -fx-text-fill: #ffa33f;
+    -fx-underline: true;
+}
+
+.hyperlink:hover {
+    -fx-text-fill: #ffb366;
+}
+
+.hyperlink:visited {
+    -fx-text-fill: #e8922c;
+}
+
+/* MenuBar */
+.menu-bar {
+    -fx-background-color: #252525;
+}
+
+.menu {
+    -fx-text-fill: #ffffff;
+}
+
+.menu:hover {
+    -fx-background-color: #2d2d2d;
+}
+
+.menu-item {
+    -fx-background-color: #252525;
+    -fx-text-fill: #ffffff;
+}
+
+.menu-item:hover {
+    -fx-background-color: #ffa33f;
+}
+
+.menu-item:hover .label {
+    -fx-text-fill: #1e1e1e;
+}
+
+/* Answer Card - For note descriptions in study session */
+.answer-card {
+    -fx-background-color: #252525;
+    -fx-background-radius: 12;
+    -fx-padding: 20;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 8, 0, 0, 4);
+    -fx-border-color: rgba(255, 255, 255, 0.05);
+    -fx-border-width: 1;
+    -fx-border-radius: 12;
+}
+
+.answer-description {
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 14px;
+    -fx-wrap-text: true;
+}
+
+.images-container {
+    -fx-padding: 10 0;
+}

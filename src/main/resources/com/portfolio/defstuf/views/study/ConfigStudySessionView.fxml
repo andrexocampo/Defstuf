@@ -7,54 +7,58 @@
 <BorderPane xmlns="http://javafx.com/javafx/11.0.1" 
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.portfolio.defstuf.controllers.study.ConfigStudySessionController"
-            style="-fx-background-color: #f5f5f5;">
+            styleClass="dark-background">
    
    <top>
-      <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 20;">
-         <HBox spacing="10" alignment="CENTER_LEFT">
-            <Button text="← Back" onAction="#handleBack" 
-                    style="-fx-background-color: #666; -fx-text-fill: white; -fx-padding: 8 16;" />
-            <Label text="Configure Study Session" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
+      <VBox spacing="15" styleClass="top-bar">
+         <HBox spacing="20" alignment="CENTER_LEFT">
+            <Button text="← Back" onAction="#handleBack" styleClass="neu-button-back" />
+            <Label text="Configure Study Session" styleClass="section-title" />
          </HBox>
-         <Separator />
       </VBox>
    </top>
    
    <center>
-      <ScrollPane fitToWidth="true" fitToHeight="true">
-         <VBox spacing="25" style="-fx-padding: 30; -fx-background-color: #f5f5f5;">
+      <ScrollPane fitToWidth="true" fitToHeight="true" styleClass="scroll-pane">
+         <VBox spacing="30" style="-fx-padding: 40;" styleClass="dark-background">
             
             <!-- Area Selection Section -->
-            <VBox spacing="15" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 8;">
-               <Label text="Select Area to Review" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
+            <VBox spacing="20" styleClass="neumorphic-panel">
+               <Label text="Select Area to Review" styleClass="subsection-title" />
                <Separator />
-               <ScrollPane fitToWidth="true" maxHeight="300" style="-fx-background-color: #fafafa;">
-                  <VBox fx:id="areasContainer" spacing="10" style="-fx-padding: 10;" />
-               </ScrollPane>
-               <Label fx:id="areasStatusLabel" text="" style="-fx-text-fill: #666; -fx-font-size: 12px;" />
+               <VBox spacing="15">
+                  <Label fx:id="areasStatusLabel" text="" styleClass="status-label" />
+                  <ScrollPane fitToWidth="true" minHeight="200" prefHeight="300" maxHeight="400" styleClass="scroll-pane">
+                     <VBox fx:id="areasContainer" spacing="12" style="-fx-padding: 15;" />
+                  </ScrollPane>
+               </VBox>
             </VBox>
             
             <!-- Source Selection Section (appears when area is selected) -->
-            <VBox fx:id="sourcesContainer" spacing="15" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 8;" visible="false" managed="false">
-               <Label text="Select Sources (Optional)" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
+            <VBox fx:id="sourcesContainer" spacing="20" styleClass="neumorphic-panel" visible="false" managed="false">
+               <Label text="Select Sources (Optional)" styleClass="subsection-title" />
                <Separator />
-               <HBox spacing="10" alignment="CENTER_LEFT">
-                  <CheckBox fx:id="selectAllSourcesCheckbox" text="Select All Sources" onAction="#handleSelectAllSources" />
-                  <Label fx:id="selectedSourcesCountLabel" text="" style="-fx-text-fill: #666; -fx-font-size: 12px;" />
-               </HBox>
-               <ScrollPane fitToWidth="true" maxHeight="250" style="-fx-background-color: #fafafa;">
-                  <VBox fx:id="sourcesCheckboxContainer" spacing="8" style="-fx-padding: 10;" />
-               </ScrollPane>
-               <Label fx:id="sourcesStatusLabel" text="Select one or more sources to filter notes. Leave empty to include all sources." 
-                      style="-fx-text-fill: #666; -fx-font-size: 12px;" />
+               <VBox spacing="15">
+                  <HBox spacing="15" alignment="CENTER_LEFT">
+                     <CheckBox fx:id="selectAllSourcesCheckbox" text="Select All Sources" 
+                              onAction="#handleSelectAllSources" />
+                     <Label fx:id="selectedSourcesCountLabel" text="" styleClass="status-label" />
+                  </HBox>
+                  <ScrollPane fitToWidth="true" minHeight="150" prefHeight="200" maxHeight="300" styleClass="scroll-pane">
+                     <VBox fx:id="sourcesCheckboxContainer" spacing="10" style="-fx-padding: 15;" />
+                  </ScrollPane>
+                  <Label fx:id="sourcesStatusLabel" 
+                        text="Select one or more sources to filter notes. Leave empty to include all sources." 
+                        styleClass="status-label" />
+               </VBox>
             </VBox>
             
             <!-- Session Configuration Section -->
-            <VBox spacing="15" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 8;">
-               <Label text="Session Configuration" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
+            <VBox spacing="20" styleClass="neumorphic-panel">
+               <Label text="Session Configuration" styleClass="subsection-title" />
                <Separator />
                
-               <GridPane hgap="20" vgap="15">
+               <GridPane hgap="25" vgap="20">
                   <columnConstraints>
                      <ColumnConstraints minWidth="200" prefWidth="250" />
                      <ColumnConstraints minWidth="200" prefWidth="300" />
@@ -62,21 +66,21 @@
                   
                   <!-- Time Limit -->
                   <Label text="Time Limit (minutes):" GridPane.columnIndex="0" GridPane.rowIndex="0" 
-                         style="-fx-font-size: 14px; -fx-font-weight: bold;" />
+                         styleClass="neu-label-light" />
                   <ComboBox fx:id="timeLimitCombo" GridPane.columnIndex="1" GridPane.rowIndex="0" 
-                            prefWidth="200" />
+                            prefWidth="250" />
                   
                   <!-- Cards Limit -->
                   <Label text="Cards/Definitions Limit:" GridPane.columnIndex="0" GridPane.rowIndex="1" 
-                         style="-fx-font-size: 14px; -fx-font-weight: bold;" />
+                         styleClass="neu-label-light" />
                   <ComboBox fx:id="cardsLimitCombo" GridPane.columnIndex="1" GridPane.rowIndex="1" 
-                            prefWidth="200" />
+                            prefWidth="250" />
                   
                   <!-- Review Order -->
                   <Label text="Review Order:" GridPane.columnIndex="0" GridPane.rowIndex="2" 
-                         style="-fx-font-size: 14px; -fx-font-weight: bold;" />
+                         styleClass="neu-label-light" />
                   <ComboBox fx:id="reviewOrderCombo" GridPane.columnIndex="1" GridPane.rowIndex="2" 
-                            prefWidth="200" />
+                            prefWidth="250" />
                </GridPane>
             </VBox>
             
@@ -85,16 +89,16 @@
    </center>
    
    <bottom>
-      <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 20;">
-         <HBox alignment="CENTER" spacing="15">
+      <VBox spacing="15" styleClass="bottom-bar">
+         <HBox alignment="CENTER" spacing="20">
             <Button fx:id="startSessionButton" text="Start Study Session" 
                     onAction="#handleStartSession"
-                    style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-padding: 12 40; -fx-font-size: 16px; -fx-font-weight: bold;" />
+                    styleClass="neu-button-primary" />
             <Button text="Cancel" onAction="#handleBack"
-                    style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-padding: 12 30; -fx-font-size: 14px;" />
+                    styleClass="neu-button-secondary" />
          </HBox>
-         <HBox alignment="CENTER" style="-fx-padding: 5 0 0 0;">
-            <Label fx:id="statusLabel" text="" style="-fx-text-fill: #666;" />
+         <HBox alignment="CENTER">
+            <Label fx:id="statusLabel" text="" styleClass="status-label" />
          </HBox>
       </VBox>
    </bottom>

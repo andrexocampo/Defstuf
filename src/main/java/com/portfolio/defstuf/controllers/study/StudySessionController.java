@@ -282,21 +282,21 @@ public class StudySessionController {
         try {
             for (Note note : currentNoteGroup.getNotes()) {
                 // Create container for each answer
-                VBox answerBox = new VBox(10);
-                answerBox.setStyle("-fx-padding: 15; -fx-background-color: #f9f9f9; -fx-background-radius: 5;");
+                VBox answerBox = new VBox(15);
+                answerBox.getStyleClass().add("answer-card");
                 
                 // Description
                 Label descriptionLabel = new Label(contentRenderer.renderContent(note.getDescription()));
                 descriptionLabel.setWrapText(true);
                 descriptionLabel.setMaxWidth(800);
-                descriptionLabel.setStyle("-fx-font-size: 14px;");
+                descriptionLabel.getStyleClass().add("answer-description");
                 answerBox.getChildren().add(descriptionLabel);
                 
                 // Load and display images (FR-05.3: Images ordered by created_at)
                 List<NoteImage> images = imageRepository.findByNoteId(note.getId());
                 if (!images.isEmpty()) {
                     HBox imagesBox = new HBox(10);
-                    imagesBox.setStyle("-fx-padding: 10 0;");
+                    imagesBox.getStyleClass().add("images-container");
                     
                     for (NoteImage image : images) {
                         try {
@@ -324,7 +324,6 @@ public class StudySessionController {
                 if (currentNoteGroup.getNotes().size() > 1 && 
                     currentNoteGroup.getNotes().indexOf(note) < currentNoteGroup.getNotes().size() - 1) {
                     Separator separator = new Separator();
-                    separator.setStyle("-fx-padding: 10 0;");
                     answerBox.getChildren().add(separator);
                 }
                 
@@ -685,17 +684,60 @@ public class StudySessionController {
             MainViewController controller = loader.getController();
             controller.setPrimaryStage(stage);
             
-            Scene scene = new Scene(root, 900, 700);
+            Scene scene = new Scene(root);
             scene.getStylesheets().add(
                 getClass().getResource("/com/portfolio/defstuf/styles/main.css").toExternalForm()
             );
             
+            // Preserve window state
+            preserveWindowState(stage, scene, 900, 750);
             stage.setTitle("DefStuf - Main");
-            stage.setScene(scene);
-            stage.centerOnScreen();
         } catch (Exception e) {
             e.printStackTrace();
             showError("Error returning to main view: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Preserves window state (size, position, maximized) when changing scenes
+     */
+    private void preserveWindowState(Stage stage, Scene newScene, double defaultWidth, double defaultHeight) {
+        boolean wasMaximized = stage.isMaximized();
+        boolean wasIconified = stage.isIconified();
+        double currentWidth = stage.getWidth();
+        double currentHeight = stage.getHeight();
+        double currentX = stage.getX();
+        double currentY = stage.getY();
+        
+        stage.setScene(newScene);
+        
+        // If window was maximized, restore that state
+        if (wasMaximized) {
+            stage.setMaximized(true);
+        } else {
+            // If window had a reasonable size, preserve it, otherwise use default
+            if (currentWidth > 100 && currentHeight > 100) {
+                stage.setWidth(currentWidth);
+                stage.setHeight(currentHeight);
+            } else {
+                stage.setWidth(defaultWidth);
+                stage.setHeight(defaultHeight);
+            }
+            // Preserve position if window wasn't maximized
+            if (currentX >= 0 && currentY >= 0) {
+                stage.setX(currentX);
+                stage.setY(currentY);
+            }
+        }
+        
+        // Restore iconified state if it was
+        if (wasIconified) {
+            stage.setIconified(true);
+        }
+        
+        // Only show if not already showing
+        if (!stage.isShowing()) {
+            stage.show();
         }
     }
     

@@ -8,104 +8,100 @@
 <BorderPane xmlns="http://javafx.com/javafx/11.0.1" 
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.portfolio.defstuf.controllers.note.CreateNoteController"
-            style="-fx-background-color: #f5f5f5;">
+            styleClass="dark-background">
    
    <top>
-      <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 20;">
-         <Label text="Create Note" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
+      <VBox spacing="15" styleClass="top-bar">
+         <Label text="Create Note" styleClass="section-title" />
          <Separator />
       </VBox>
    </top>
    
    <center>
-      <ScrollPane fitToWidth="true" fitToHeight="true">
-         <VBox spacing="20" style="-fx-padding: 20;">
+      <ScrollPane fitToWidth="true" fitToHeight="true" styleClass="scroll-pane">
+         <VBox spacing="25" style="-fx-padding: 30;" styleClass="dark-background">
+            <VBox spacing="20" styleClass="neumorphic-panel">
             
-            <!-- Title Section -->
-            <VBox spacing="5">
-               <Label text="Title:" style="-fx-font-size: 14px; -fx-font-weight: bold;" />
-               <TextField fx:id="titleField" promptText="Enter note title..." 
-                          style="-fx-font-size: 14px;" />
-            </VBox>
-            
-            <!-- Source Section -->
-            <VBox spacing="5">
-               <Label text="Source:" style="-fx-font-size: 14px; -fx-font-weight: bold;" />
-               <HBox spacing="10">
-                  <ComboBox fx:id="sourceComboBox" promptText="Select source..." 
-                            style="-fx-font-size: 14px;" HBox.hgrow="ALWAYS" />
-                  <Button fx:id="addSourceButton" text="Add Source" 
-                          onAction="#handleAddSource"
-                          style="-fx-font-size: 14px; -fx-padding: 5 10; -fx-background-color: #007bff; -fx-text-fill: white;" />
-                  <Button fx:id="viewSourcesButton" text="View Sources" 
-                          onAction="#handleViewSources"
-                          style="-fx-font-size: 14px; -fx-padding: 5 10; -fx-background-color: #6c757d; -fx-text-fill: white;" />
-               </HBox>
-            </VBox>
-            
-            <!-- Area, Source and Note Type Section -->
-            <HBox spacing="20">
-               <VBox spacing="5" HBox.hgrow="ALWAYS">
-                  <Label text="Area:" style="-fx-font-size: 14px; -fx-font-weight: bold;" />
-                  <ComboBox fx:id="areaComboBox" promptText="Select area..." 
-                            style="-fx-font-size: 14px;" />
+               <!-- Title Section -->
+               <VBox spacing="8">
+                  <Label text="Title:" styleClass="neu-label-light" />
+                  <TextField fx:id="titleField" promptText="Enter note title..." />
                </VBox>
                
-               <VBox spacing="5" HBox.hgrow="ALWAYS">
-                  <Label text="Note Type:" style="-fx-font-size: 14px; -fx-font-weight: bold;" />
-                  <ComboBox fx:id="noteTypeComboBox" promptText="Select note type..." 
-                            style="-fx-font-size: 14px;" />
+               <!-- Source Section -->
+               <VBox spacing="8">
+                  <Label text="Source:" styleClass="neu-label-light" />
+                  <HBox spacing="10">
+                     <ComboBox fx:id="sourceComboBox" promptText="Select source..." HBox.hgrow="ALWAYS" />
+                     <Button fx:id="addSourceButton" text="Add Source" 
+                             onAction="#handleAddSource"
+                             styleClass="neu-button-secondary" />
+                     <Button fx:id="viewSourcesButton" text="View Sources" 
+                             onAction="#handleViewSources"
+                             styleClass="neu-button-secondary" />
+                  </HBox>
                </VBox>
-            </HBox>
-            
-            <!-- Description Section -->
-            <VBox spacing="5">
-               <Label text="Description:" style="-fx-font-size: 14px; -fx-font-weight: bold;" />
-               <TextArea fx:id="descriptionArea" promptText="Enter note description (optional)..." 
-                         wrapText="true" prefRowCount="5"
-                         style="-fx-font-size: 14px;" />
-            </VBox>
-            
-            <!-- Screenshots Section -->
-            <VBox spacing="10">
-               <HBox spacing="10" alignment="CENTER_LEFT">
-                  <Label text="Screenshots:" style="-fx-font-size: 14px; -fx-font-weight: bold;" />
-                  <Button fx:id="captureButton" 
-                          text="Capture Screenshot" 
-                          onAction="#captureScreenshot"
-                          style="-fx-font-size: 14px; -fx-padding: 8 16; -fx-background-color: #0078d4; -fx-text-fill: white;" />
+               
+               <!-- Area, Source and Note Type Section -->
+               <HBox spacing="20">
+                  <VBox spacing="8" HBox.hgrow="ALWAYS">
+                     <Label text="Area:" styleClass="neu-label-light" />
+                     <ComboBox fx:id="areaComboBox" promptText="Select area..." />
+                  </VBox>
+                  
+                  <VBox spacing="8" HBox.hgrow="ALWAYS">
+                     <Label text="Note Type:" styleClass="neu-label-light" />
+                     <ComboBox fx:id="noteTypeComboBox" promptText="Select note type..." />
+                  </VBox>
                </HBox>
                
-               <!-- Screenshots Container -->
-               <BorderPane style="-fx-background-color: white; -fx-border-color: #cccccc; -fx-border-width: 1;">
-                  <center>
-                     <ScrollPane fitToWidth="true" minHeight="300" maxHeight="400">
-                        <VBox fx:id="screenshotsContainer" spacing="10" style="-fx-padding: 10;">
-                           <Label fx:id="screenshotsPlaceholderLabel" 
-                                  text="No screenshots captured yet" 
-                                  style="-fx-text-fill: #999999; -fx-alignment: CENTER;" />
-                        </VBox>
-                     </ScrollPane>
-                  </center>
-               </BorderPane>
+               <!-- Description Section -->
+               <VBox spacing="8">
+                  <Label text="Description:" styleClass="neu-label-light" />
+                  <TextArea fx:id="descriptionArea" promptText="Enter note description (optional)..." 
+                            wrapText="true" prefRowCount="5" />
+               </VBox>
+               
+               <!-- Screenshots Section -->
+               <VBox spacing="10">
+                  <HBox spacing="10" alignment="CENTER_LEFT">
+                     <Label text="Screenshots:" styleClass="neu-label-light" />
+                     <Button fx:id="captureButton" 
+                             text="Capture Screenshot" 
+                             onAction="#captureScreenshot"
+                             styleClass="neu-button-secondary" />
+                  </HBox>
+                  
+                  <!-- Screenshots Container -->
+                  <BorderPane styleClass="neumorphic-inset">
+                     <center>
+                        <ScrollPane fitToWidth="true" minHeight="300" maxHeight="400" styleClass="scroll-pane">
+                           <VBox fx:id="screenshotsContainer" spacing="10" style="-fx-padding: 15;">
+                              <Label fx:id="screenshotsPlaceholderLabel" 
+                                     text="No screenshots captured yet" 
+                                     styleClass="status-label" 
+                                     style="-fx-alignment: CENTER;" />
+                           </VBox>
+                        </ScrollPane>
+                     </center>
+                  </BorderPane>
+               </VBox>
             </VBox>
-            
          </VBox>
       </ScrollPane>
    </center>
    
    <bottom>
-      <HBox spacing="10" alignment="CENTER_RIGHT" 
-            style="-fx-background-color: white; -fx-padding: 20; -fx-border-color: #e0e0e0; -fx-border-width: 1 0 0 0;">
+      <HBox spacing="15" alignment="CENTER_RIGHT" styleClass="bottom-bar">
          <Button fx:id="cancelButton" 
                  text="Cancel" 
                  onAction="#cancel"
-                 style="-fx-font-size: 14px; -fx-padding: 8 16; -fx-background-color: #6c757d; -fx-text-fill: white;" />
+                 styleClass="neu-button-secondary" />
          
          <Button fx:id="saveButton" 
                  text="Save Note" 
                  onAction="#saveNote"
-                 style="-fx-font-size: 14px; -fx-padding: 8 16; -fx-background-color: #28a745; -fx-text-fill: white;" />
+                 styleClass="neu-button-primary" />
       </HBox>
    </bottom>
    

@@ -114,13 +114,13 @@ public class ConfigStudySessionController {
             
             if (areas.isEmpty()) {
                 areasStatusLabel.setText("No areas available. Please create an area first.");
-                areasStatusLabel.setStyle("-fx-text-fill: #d32f2f;");
+                areasStatusLabel.getStyleClass().setAll("status-label-error");
                 startSessionButton.setDisable(true);
                 return;
             }
             
             areasStatusLabel.setText("Select an area to review from the list below:");
-            areasStatusLabel.setStyle("-fx-text-fill: #666;");
+            areasStatusLabel.getStyleClass().setAll("status-label");
             
             Long userId = SessionManager.getInstance().getCurrentUserId();
             
@@ -132,7 +132,7 @@ public class ConfigStudySessionController {
         } catch (AreaService.AreaException e) {
             showError("Error loading areas: " + e.getMessage());
             areasStatusLabel.setText("Error loading areas");
-            areasStatusLabel.setStyle("-fx-text-fill: #d32f2f;");
+            areasStatusLabel.getStyleClass().setAll("status-label-error");
         }
     }
     
@@ -142,8 +142,8 @@ public class ConfigStudySessionController {
     private HBox createAreaRadioButton(Area area, Long userId) {
         HBox row = new HBox(15);
         row.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
-        row.setPadding(new Insets(8, 10, 8, 10));
-        row.setStyle("-fx-background-color: #fafafa; -fx-background-radius: 5;");
+        row.setPadding(new Insets(12, 20, 12, 20));
+        row.getStyleClass().add("area-row");
         
         // Radio button
         RadioButton radioButton = new RadioButton();
@@ -159,7 +159,7 @@ public class ConfigStudySessionController {
         
         // Area name label
         Label nameLabel = new Label(area.getName());
-        nameLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #333;");
+        nameLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #faf5e9;");
         nameLabel.setPrefWidth(200);
         
         // Counters container
@@ -184,22 +184,22 @@ public class ConfigStudySessionController {
             Label pendingLabel = new Label(String.format("Pending: %d", pendingNotes));
             Label totalLabel = new Label(String.format("Total: %d", totalNotes));
             
-            newLabel.setStyle("-fx-text-fill: #2196F3; -fx-font-size: 12px;");
-            pendingLabel.setStyle("-fx-text-fill: #FF9800; -fx-font-size: 12px;");
-            totalLabel.setStyle("-fx-text-fill: #666; -fx-font-size: 12px;");
+            newLabel.getStyleClass().add("counter-new");
+            pendingLabel.getStyleClass().add("counter-pending");
+            totalLabel.getStyleClass().add("counter-total");
             
             countersBox.getChildren().addAll(newLabel, pendingLabel, totalLabel);
             
             if (totalNotes == 0) {
                 Label errorLabel = new Label("(0 definitions - cannot start session)");
-                errorLabel.setStyle("-fx-text-fill: #d32f2f; -fx-font-size: 12px;");
+                errorLabel.getStyleClass().add("status-label-error");
                 countersBox.getChildren().clear();
                 countersBox.getChildren().add(errorLabel);
                 radioButton.setDisable(true);
             }
         } catch (SQLException e) {
             Label errorLabel = new Label("(Error loading count)");
-            errorLabel.setStyle("-fx-text-fill: #d32f2f; -fx-font-size: 12px;");
+            errorLabel.getStyleClass().add("status-label-error");
             countersBox.getChildren().clear();
             countersBox.getChildren().add(errorLabel);
         }
@@ -329,7 +329,6 @@ public class ConfigStudySessionController {
                     );
                     String countText = noteCount == 1 ? "1 definition" : noteCount + " definitions";
                     checkBox.setText(source.getName() + " (" + countText + ")");
-                    checkBox.setStyle("-fx-font-size: 13px;");
                     
                     // Add listener to update counts when selection changes
                     checkBox.selectedProperty().addListener((obs, oldVal, newVal) -> {
@@ -438,16 +437,16 @@ public class ConfigStudySessionController {
                     
                     if (totalNotes == 0) {
                         Label errorLabel = new Label("(0 definitions - cannot start session)");
-                        errorLabel.setStyle("-fx-text-fill: #d32f2f; -fx-font-size: 12px;");
+                        errorLabel.getStyleClass().add("status-label-error");
                         countersBox.getChildren().add(errorLabel);
                     } else {
                         Label newLabel = new Label(String.format("New: %d", newNotes));
                         Label pendingLabel = new Label(String.format("Pending: %d", pendingNotes));
                         Label totalLabel = new Label(String.format("Total: %d", totalNotes));
                         
-                        newLabel.setStyle("-fx-text-fill: #2196F3; -fx-font-size: 12px;");
-                        pendingLabel.setStyle("-fx-text-fill: #FF9800; -fx-font-size: 12px;");
-                        totalLabel.setStyle("-fx-text-fill: #666; -fx-font-size: 12px;");
+                        newLabel.getStyleClass().add("counter-new");
+                        pendingLabel.getStyleClass().add("counter-pending");
+                        totalLabel.getStyleClass().add("counter-total");
                         
                         countersBox.getChildren().addAll(newLabel, pendingLabel, totalLabel);
                     }
@@ -589,8 +588,13 @@ public class ConfigStudySessionController {
             controller.setStudySession(session, areaId, sourceIds, onlyNewAndPending);
             
             Scene scene = new Scene(root);
-            stage.setScene(scene);
-            stage.centerOnScreen();
+            scene.getStylesheets().add(
+                getClass().getResource("/com/portfolio/defstuf/styles/main.css").toExternalForm()
+            );
+            
+            // Preserve window state
+            preserveWindowState(stage, scene, 1000, 750);
+            stage.setTitle("DefStuf - Study Session");
         } catch (Exception e) {
             e.printStackTrace();
             showError("Error loading study session view: " + e.getMessage());
@@ -650,17 +654,60 @@ public class ConfigStudySessionController {
             MainViewController controller = loader.getController();
             controller.setPrimaryStage(primaryStage);
             
-            Scene scene = new Scene(root, 900, 700);
+            Scene scene = new Scene(root);
             scene.getStylesheets().add(
                 getClass().getResource("/com/portfolio/defstuf/styles/main.css").toExternalForm()
             );
             
+            // Preserve window state
+            preserveWindowState(primaryStage, scene, 900, 750);
             primaryStage.setTitle("DefStuf - Main");
-            primaryStage.setScene(scene);
-            primaryStage.show();
         } catch (Exception e) {
             e.printStackTrace();
             showError("Error returning to main view: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Preserves window state (size, position, maximized) when changing scenes
+     */
+    private void preserveWindowState(Stage stage, Scene newScene, double defaultWidth, double defaultHeight) {
+        boolean wasMaximized = stage.isMaximized();
+        boolean wasIconified = stage.isIconified();
+        double currentWidth = stage.getWidth();
+        double currentHeight = stage.getHeight();
+        double currentX = stage.getX();
+        double currentY = stage.getY();
+        
+        stage.setScene(newScene);
+        
+        // If window was maximized, restore that state
+        if (wasMaximized) {
+            stage.setMaximized(true);
+        } else {
+            // If window had a reasonable size, preserve it, otherwise use default
+            if (currentWidth > 100 && currentHeight > 100) {
+                stage.setWidth(currentWidth);
+                stage.setHeight(currentHeight);
+            } else {
+                stage.setWidth(defaultWidth);
+                stage.setHeight(defaultHeight);
+            }
+            // Preserve position if window wasn't maximized
+            if (currentX >= 0 && currentY >= 0) {
+                stage.setX(currentX);
+                stage.setY(currentY);
+            }
+        }
+        
+        // Restore iconified state if it was
+        if (wasIconified) {
+            stage.setIconified(true);
+        }
+        
+        // Only show if not already showing
+        if (!stage.isShowing()) {
+            stage.show();
         }
     }
     
@@ -675,7 +722,7 @@ public class ConfigStudySessionController {
         alert.showAndWait();
         
         statusLabel.setText("Error: " + message);
-        statusLabel.setStyle("-fx-text-fill: #d32f2f;");
+        statusLabel.getStyleClass().setAll("status-label-error");
     }
 }
 
