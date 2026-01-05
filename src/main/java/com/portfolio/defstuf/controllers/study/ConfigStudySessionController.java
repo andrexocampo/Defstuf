@@ -5,6 +5,7 @@ import com.portfolio.defstuf.models.area.Area;
 import com.portfolio.defstuf.models.note.Source;
 import com.portfolio.defstuf.models.study.StudySession;
 import com.portfolio.defstuf.repository.note.NoteRepository;
+import com.portfolio.defstuf.repository.study.ScheduledReviewRepository;
 import com.portfolio.defstuf.services.area.AreaService;
 import com.portfolio.defstuf.services.note.SourceService;
 import com.portfolio.defstuf.services.study.StudySessionService;
@@ -72,6 +73,7 @@ public class ConfigStudySessionController {
     private StudySessionService studySessionService;
     private NoteRepository noteRepository;
     private SourceService sourceService;
+    private ScheduledReviewRepository scheduledReviewRepository;
     private ToggleGroup areaToggleGroup;
     private List<Source> availableSources;
     private List<CheckBox> sourceCheckboxes;
@@ -86,6 +88,7 @@ public class ConfigStudySessionController {
         studySessionService = new StudySessionService();
         noteRepository = new NoteRepository();
         sourceService = new SourceService();
+        scheduledReviewRepository = new ScheduledReviewRepository();
         areaToggleGroup = new ToggleGroup();
         availableSources = new ArrayList<>();
         sourceCheckboxes = new ArrayList<>();
@@ -171,6 +174,9 @@ public class ConfigStudySessionController {
         try {
             List<Long> allSourceIds = null; // For counting without source filter
             LocalDate today = LocalDate.now();
+            
+            // Update scheduled reviews from 'reviewed' to 'pending' when their scheduled_date has arrived
+            scheduledReviewRepository.updateToPendingWhenDue(today);
             
             int newNotes = noteRepository.countNewNotesByAreaIdAndUserIdAndSourceIds(
                 area.getId(), userId, allSourceIds);
@@ -415,6 +421,9 @@ public class ConfigStudySessionController {
             Long userId = SessionManager.getInstance().getCurrentUserId();
             LocalDate today = LocalDate.now();
             
+            // Update scheduled reviews from 'reviewed' to 'pending' when their scheduled_date has arrived
+            scheduledReviewRepository.updateToPendingWhenDue(today);
+            
             // Get selected source IDs
             List<Long> selectedSourceIds = getSelectedSourceIds();
             
@@ -499,6 +508,9 @@ public class ConfigStudySessionController {
             LocalDate today = LocalDate.now();
             
             // Check how many new and pending notes there are
+            // Update scheduled reviews from 'reviewed' to 'pending' when their scheduled_date has arrived
+            scheduledReviewRepository.updateToPendingWhenDue(today);
+            
             int newNotes = noteRepository.countNewNotesByAreaIdAndUserIdAndSourceIds(
                 selectedArea.getId(), userId, selectedSourceIds.isEmpty() ? null : selectedSourceIds);
             int pendingNotes = noteRepository.countPendingNotesByAreaIdAndUserIdAndSourceIds(

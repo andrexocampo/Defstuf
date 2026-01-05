@@ -175,6 +175,29 @@ public class ScheduledReviewRepository {
     }
     
     /**
+     * Updates scheduled reviews from 'reviewed' to 'pending' when their scheduled_date has arrived
+     * This should be called before querying pending notes to ensure accuracy
+     * 
+     * @param today The current date to compare scheduled_date against
+     * @return Number of scheduled reviews updated
+     * @throws SQLException If database error occurs
+     */
+    public int updateToPendingWhenDue(LocalDate today) throws SQLException {
+        String sql = "UPDATE scheduled_reviews " +
+                     "SET review_status = 'pending', updated_at = ? " +
+                     "WHERE review_status = 'reviewed' AND scheduled_date <= ?";
+        
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()));
+            stmt.setDate(2, Date.valueOf(today));
+            
+            return stmt.executeUpdate();
+        }
+    }
+    
+    /**
      * Updates an existing scheduled review
      */
     public boolean update(ScheduledReview review) throws SQLException {
