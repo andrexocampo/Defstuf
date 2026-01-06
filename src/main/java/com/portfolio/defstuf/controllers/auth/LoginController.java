@@ -5,6 +5,7 @@ import com.portfolio.defstuf.services.auth.AuthenticationService;
 import com.portfolio.defstuf.session.SessionManager;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -12,6 +13,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 /**
@@ -111,7 +113,7 @@ public class LoginController {
             RegisterController controller = loader.getController();
             controller.setPrimaryStage(primaryStage);
             
-            Scene scene = new Scene(root);
+            Scene scene = new Scene(root, 600, 650);
             scene.getStylesheets().add(
                 getClass().getResource("/com/portfolio/defstuf/styles/main.css").toExternalForm()
             );
@@ -138,7 +140,7 @@ public class LoginController {
             MainViewController controller = loader.getController();
             controller.setPrimaryStage(primaryStage);
             
-            Scene scene = new Scene(root);
+            Scene scene = new Scene(root, 900, 750);
             scene.getStylesheets().add(
                 getClass().getResource("/com/portfolio/defstuf/styles/main.css").toExternalForm()
             );
@@ -182,30 +184,61 @@ public class LoginController {
         double currentX = stage.getX();
         double currentY = stage.getY();
         
-        stage.setScene(newScene);
-        
-        // If window was maximized, restore that state
+        // If maximized, handle transition carefully
         if (wasMaximized) {
+            // Get screen bounds
+            Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+            
+            // Temporarily unmaximize to avoid conflicts during scene change
+            stage.setMaximized(false);
+            
+            // Set the stage size to screen size before changing scene
+            // This ensures the new scene matches the maximized size
+            stage.setWidth(screenBounds.getWidth());
+            stage.setHeight(screenBounds.getHeight());
+            stage.setX(screenBounds.getMinX());
+            stage.setY(screenBounds.getMinY());
+            
+            // Now set the new scene
+            stage.setScene(newScene);
+            
+            // Immediately restore maximized state
             stage.setMaximized(true);
+            
+            // Use Platform.runLater for final verification
+            javafx.application.Platform.runLater(() -> {
+                if (!stage.isMaximized()) {
+                    stage.setMaximized(true);
+                }
+                if (wasIconified) {
+                    stage.setIconified(true);
+                }
+            });
         } else {
-            // If window had a reasonable size, preserve it, otherwise use default
-            if (currentWidth > 100 && currentHeight > 100) {
-                stage.setWidth(currentWidth);
-                stage.setHeight(currentHeight);
-            } else {
-                stage.setWidth(defaultWidth);
-                stage.setHeight(defaultHeight);
-            }
-            // Preserve position if window wasn't maximized
-            if (currentX >= 0 && currentY >= 0) {
-                stage.setX(currentX);
-                stage.setY(currentY);
-            }
-        }
-        
-        // Restore iconified state if it was
-        if (wasIconified) {
-            stage.setIconified(true);
+            // For non-maximized windows, set scene and restore size/position
+            stage.setScene(newScene);
+            
+            // Use Platform.runLater to restore state after scene is fully set
+            javafx.application.Platform.runLater(() -> {
+                // If window had a reasonable size, preserve it, otherwise use default
+                if (currentWidth > 100 && currentHeight > 100) {
+                    stage.setWidth(currentWidth);
+                    stage.setHeight(currentHeight);
+                } else {
+                    stage.setWidth(defaultWidth);
+                    stage.setHeight(defaultHeight);
+                }
+                // Preserve position
+                if (currentX >= 0 && currentY >= 0) {
+                    stage.setX(currentX);
+                    stage.setY(currentY);
+                }
+                
+                // Restore iconified state if it was
+                if (wasIconified) {
+                    stage.setIconified(true);
+                }
+            });
         }
         
         // Only show if not already showing
