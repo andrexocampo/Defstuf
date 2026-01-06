@@ -24,6 +24,8 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.geometry.Rectangle2D;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -204,14 +206,15 @@ public class StudySessionController {
     
     /**
      * Shows the next note group
+     * First processes all normal notes, then shows review queue (forgot/hard notes) at the end
      */
     private void showNextNote() {
-        // Check if there are more notes in review queue
-        if (noteGroupingService.hasMoreInReviewQueue()) {
-            currentNoteGroup = noteGroupingService.getNextFromReviewQueue();
-        } else if (currentNoteGroupIndex < noteGroups.size()) {
+        // First process all normal notes, then process review queue at the end
+        if (currentNoteGroupIndex < noteGroups.size()) {
             currentNoteGroup = noteGroups.get(currentNoteGroupIndex);
             currentNoteGroupIndex++;
+        } else if (noteGroupingService.hasMoreInReviewQueue()) {
+            currentNoteGroup = noteGroupingService.getNextFromReviewQueue();
         } else {
             // Session completed
             handleSessionComplete();
@@ -304,8 +307,8 @@ public class StudySessionController {
                             if (imageFile.exists()) {
                                 Image fxImage = new Image(imageFile.toURI().toString());
                                 ImageView imageView = new ImageView(fxImage);
-                                imageView.setFitWidth(300);
-                                imageView.setFitHeight(200);
+                                imageView.setFitWidth(450);
+                                imageView.setFitHeight(300);
                                 imageView.setPreserveRatio(true);
                                 imageView.setSmooth(true);
                                 imagesBox.getChildren().add(imageView);
@@ -684,7 +687,7 @@ public class StudySessionController {
             MainViewController controller = loader.getController();
             controller.setPrimaryStage(stage);
             
-            Scene scene = new Scene(root);
+            Scene scene = new Scene(root, 900, 750);
             scene.getStylesheets().add(
                 getClass().getResource("/com/portfolio/defstuf/styles/main.css").toExternalForm()
             );
@@ -709,30 +712,47 @@ public class StudySessionController {
         double currentX = stage.getX();
         double currentY = stage.getY();
         
-        stage.setScene(newScene);
-        
-        // If window was maximized, restore that state
+        // If maximized, set scene and restore maximized state immediately
         if (wasMaximized) {
-            stage.setMaximized(true);
+            stage.setScene(newScene);
+            // Restore maximized state immediately and ensure it stays maximized
+            javafx.application.Platform.runLater(() -> {
+                stage.setMaximized(true);
+                // Double-check to ensure it stays maximized
+                javafx.application.Platform.runLater(() -> {
+                    if (!stage.isMaximized()) {
+                        stage.setMaximized(true);
+                    }
+                });
+                if (wasIconified) {
+                    stage.setIconified(true);
+                }
+            });
         } else {
-            // If window had a reasonable size, preserve it, otherwise use default
-            if (currentWidth > 100 && currentHeight > 100) {
-                stage.setWidth(currentWidth);
-                stage.setHeight(currentHeight);
-            } else {
-                stage.setWidth(defaultWidth);
-                stage.setHeight(defaultHeight);
-            }
-            // Preserve position if window wasn't maximized
-            if (currentX >= 0 && currentY >= 0) {
-                stage.setX(currentX);
-                stage.setY(currentY);
-            }
-        }
-        
-        // Restore iconified state if it was
-        if (wasIconified) {
-            stage.setIconified(true);
+            // For non-maximized windows, set scene and restore size/position
+            stage.setScene(newScene);
+            
+            // Use Platform.runLater to restore state after scene is fully set
+            javafx.application.Platform.runLater(() -> {
+                // If window had a reasonable size, preserve it, otherwise use default
+                if (currentWidth > 100 && currentHeight > 100) {
+                    stage.setWidth(currentWidth);
+                    stage.setHeight(currentHeight);
+                } else {
+                    stage.setWidth(defaultWidth);
+                    stage.setHeight(defaultHeight);
+                }
+                // Preserve position
+                if (currentX >= 0 && currentY >= 0) {
+                    stage.setX(currentX);
+                    stage.setY(currentY);
+                }
+                
+                // Restore iconified state if it was
+                if (wasIconified) {
+                    stage.setIconified(true);
+                }
+            });
         }
         
         // Only show if not already showing
