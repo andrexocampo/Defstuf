@@ -4,11 +4,13 @@ import com.portfolio.defstuf.models.area.Area;
 import com.portfolio.defstuf.services.area.AreaService;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import java.time.format.DateTimeFormatter;
@@ -132,7 +134,7 @@ public class AreaDetailController {
             controller.setPrimaryStage(primaryStage);
             controller.setArea(currentArea);
             
-            Scene scene = new Scene(root);
+            Scene scene = new Scene(root, 600, 550);
             scene.getStylesheets().add(
                 getClass().getResource("/com/portfolio/defstuf/styles/main.css").toExternalForm()
             );
@@ -201,7 +203,7 @@ public class AreaDetailController {
             controller.setPrimaryStage(primaryStage);
             controller.refreshAreas();
             
-            Scene scene = new Scene(root);
+            Scene scene = new Scene(root, 900, 750);
             scene.getStylesheets().add(
                 getClass().getResource("/com/portfolio/defstuf/styles/main.css").toExternalForm()
             );
@@ -225,30 +227,47 @@ public class AreaDetailController {
         double currentX = stage.getX();
         double currentY = stage.getY();
         
-        stage.setScene(newScene);
-        
-        // If window was maximized, restore that state
+        // If maximized, set scene and restore maximized state immediately
         if (wasMaximized) {
-            stage.setMaximized(true);
+            stage.setScene(newScene);
+            // Restore maximized state immediately and ensure it stays maximized
+            javafx.application.Platform.runLater(() -> {
+                stage.setMaximized(true);
+                // Double-check to ensure it stays maximized
+                javafx.application.Platform.runLater(() -> {
+                    if (!stage.isMaximized()) {
+                        stage.setMaximized(true);
+                    }
+                });
+                if (wasIconified) {
+                    stage.setIconified(true);
+                }
+            });
         } else {
-            // If window had a reasonable size, preserve it, otherwise use default
-            if (currentWidth > 100 && currentHeight > 100) {
-                stage.setWidth(currentWidth);
-                stage.setHeight(currentHeight);
-            } else {
-                stage.setWidth(defaultWidth);
-                stage.setHeight(defaultHeight);
-            }
-            // Preserve position if window wasn't maximized
-            if (currentX >= 0 && currentY >= 0) {
-                stage.setX(currentX);
-                stage.setY(currentY);
-            }
-        }
-        
-        // Restore iconified state if it was
-        if (wasIconified) {
-            stage.setIconified(true);
+            // For non-maximized windows, set scene and restore size/position
+            stage.setScene(newScene);
+            
+            // Use Platform.runLater to restore state after scene is fully set
+            javafx.application.Platform.runLater(() -> {
+                // If window had a reasonable size, preserve it, otherwise use default
+                if (currentWidth > 100 && currentHeight > 100) {
+                    stage.setWidth(currentWidth);
+                    stage.setHeight(currentHeight);
+                } else {
+                    stage.setWidth(defaultWidth);
+                    stage.setHeight(defaultHeight);
+                }
+                // Preserve position
+                if (currentX >= 0 && currentY >= 0) {
+                    stage.setX(currentX);
+                    stage.setY(currentY);
+                }
+                
+                // Restore iconified state if it was
+                if (wasIconified) {
+                    stage.setIconified(true);
+                }
+            });
         }
         
         // Only show if not already showing
