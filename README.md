@@ -166,26 +166,34 @@ mvn javafx:run
 ## Screenshots
 
 ### Authentication
-![Login Screen](docs/screenshots/login.png)
 
-![Registration Screen](docs/screenshots/register.png)
+![Login](docs/screenshots/image8.PNG)
 
-### Main Interface
-![Main Dashboard](docs/screenshots/main-dashboard.png)
+![Registration](docs/screenshots/image9.JPG)
 
-### Note Management
-![Manage Areas](docs/screenshots/manage-areas.png)
+### Main Menu
 
-![Create Note](docs/screenshots/create-note.png)
+![Main Menu](docs/screenshots/image2.PNG)
 
-### Study Sessions
-![Study Session Configuration](docs/screenshots/study-config.png)
+### Note Creation
 
-![Study Session - Question View](docs/screenshots/study-session-question.png)
+![Create Note](docs/screenshots/image1.PNG)
 
-![Study Session - Answer View](docs/screenshots/study-session-answer.png)
+### Area Management
 
-> **Note**: Screenshots will be displayed here once added to the `docs/screenshots/` directory. See `docs/screenshots/README.md` for instructions.
+![Manage Areas](docs/screenshots/image4.PNG)
+
+![Area Detail](docs/screenshots/image5.PNG)
+
+### Study Session Configuration
+
+![Configure Study Session](docs/screenshots/image3.PNG)
+
+### Study Session
+
+![Study Session - Question](docs/screenshots/image6.PNG)
+
+![Study Session - Answer](docs/screenshots/image7.PNG)
 
 ## Database Schema
 
